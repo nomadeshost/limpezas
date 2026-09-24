@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#011126">
+<title>Limpezas · Nômades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --noite: #011126;
+    --profundo: #023059;
+    --roxo: #6f6da6;
+    --laranja: #f27405;
+    --amarelo: #fcb229;
+    --areia: #e8e4dd;
+    --areia-clara: #f4f1e9;
+    --branco: #ffffff;
+    --texto: #011126;
+    --suave: rgba(2, 48, 89, 0.68);
+    --linha: #e8e4dd;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--areia-clara);
+    color: var(--texto);
+    font-family: 'Manrope', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.45;
+    min-height: 100vh;
+  }
+  a { color: inherit; }
+  button { font: inherit; cursor: pointer; }
+
+  /* ---------- topo ---------- */
+  .topo {
+    background: var(--noite);
+    color: var(--areia);
+    padding: calc(18px + env(safe-area-inset-top)) 16px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .topo .marca-dagua {
+    position: absolute; right: -60px; top: -30px;
+    width: 240px; color: #0a2140; pointer-events: none;
+  }
+  .topo-linha {
+    position: relative;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    max-width: 640px; margin: 0 auto;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo svg { width: 34px; height: auto; color: var(--roxo); flex-shrink: 0; }
+  .logo-texto { display: flex; flex-direction: column; }
+  .logo-nome { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 22px; color: var(--amarelo); line-height: 1; }
+  .logo-sub { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--areia); opacity: 0.8; margin-top: 4px; }
+  .btn-atualizar {
+    background: var(--amarelo); color: var(--noite); border: 0;
+    border-radius: 999px; padding: 10px 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .btn-atualizar:disabled { opacity: 0.6; }
+  .btn-atualizar svg { width: 14px; height: 14px; }
+  .girando svg { animation: gira 0.8s linear infinite; }
+  @keyframes gira { to { transform: rotate(360deg); } }
+  .atualizado {
+    position: relative; max-width: 640px; margin: 14px auto 0;
+    font-size: 13px; color: var(--areia); opacity: 0.75;
+  }
+
+  /* ---------- dias ---------- */
+  .dias {
+    position: relative;
+    display: flex; gap: 8px; overflow-x: auto;
+    max-width: 640px; margin: 14px auto 0;
+    padding: 0 0 16px;
+    scrollbar-width: none;
+  }
+  .dias::-webkit-scrollbar { display: none; }
+  .dia-chip {
+    flex: 0 0 auto;
+    min-width: 58px;
+    background: transparent; color: var(--areia);
+    border: 1px solid rgba(232, 228, 221, 0.25);
+    border-radius: 999px;
+    padding: 8px 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+  }
+  .dia-chip .sem { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.8; }
+  .dia-chip .num { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 17px; }
+  .dia-chip .qtd {
+    font-size: 11px; font-weight: 700;
+    min-width: 20px; padding: 0 6px; border-radius: 999px;
+    background: rgba(232, 228, 221, 0.15);
+  }
+  .dia-chip.tem .qtd { background: var(--amarelo); color: var(--noite); }
+  .dia-chip.ativo { background: var(--areia); color: var(--noite); border-color: var(--areia); }
+  .dia-chip.ativo .qtd { background: var(--noite); color: var(--amarelo); }
+
+  /* ---------- conteúdo ---------- */
+  main { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; }
+  .dia { padding-top: 20px; scroll-margin-top: 8px; }
+  .dia-titulo {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .dia-titulo h2 {
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 20px;
+    color: var(--profundo); line-height: 1.2;
+  }
+  .dia-titulo h2 small { font-weight: 500; color: var(--suave); font-size: 16px; }
+  .dia-titulo .conta { font-size: 13px; color: var(--suave); white-space: nowrap; }
+  .vazio {
+    border: 1px dashed #cfc9bf; padding: 16px; color: var(--suave); font-size: 14px;
+  }
+
+  .card {
+    background: var(--branco);
+    border: 1px solid var(--linha);
+    border-left: 5px solid var(--profundo);
+    margin-bottom: 12px;
+  }
+  .card.critico { border-left-color: var(--laranja); }
+  .card.feito { border-left-color: var(--roxo); opacity: 0.62; }
+  .card-topo { padding: 14px 16px 0; }
+  .horario-linha { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+  .tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 5px 10px; border-radius: 999px; line-height: 1.2;
+  }
+  .tag-hora { background: var(--profundo); color: var(--areia); }
+  .tag-hora.prazo { background: var(--areia); color: var(--profundo); }
+  .tag-prioridade { background: var(--laranja); color: var(--branco); }
+  .tag-feito { background: var(--roxo); color: var(--branco); }
+  .ressalva { font-size: 13px; color: var(--suave); width: 100%; }
+  .imovel {
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 24px;
+    color: var(--profundo); line-height: 1.15;
+  }
+  .endereco { font-size: 14px; color: var(--suave); margin-top: 4px; }
+  .endereco a { color: var(--profundo); font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .endereco a::after { content: " ↗"; }
+
+  .bloco { padding: 12px 16px; border-top: 1px solid var(--linha); margin-top: 12px; }
+  .bloco + .bloco { margin-top: 0; }
+  .bloco-rotulo {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--suave); margin-bottom: 6px;
+  }
+  .kits { list-style: none; display: grid; gap: 6px; }
+  .kits li { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; }
+  .kits .qt {
+    flex-shrink: 0; min-width: 28px; height: 28px; border-radius: 999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 15px;
+    background: var(--profundo); color: var(--areia);
+  }
+  .kits .armario .qt { background: var(--areia); color: var(--profundo); }
+  .kits b { font-weight: 700; }
+  .kits .det { display: block; font-size: 13px; color: var(--suave); }
+  .hospedes { margin-top: 8px; font-size: 14px; color: var(--profundo); font-weight: 600; }
+
+  .acesso { font-size: 14px; display: grid; gap: 4px; }
+  .acesso a { color: var(--profundo); font-weight: 700; }
+  .senha { font-family: 'Outfit', sans-serif; font-weight: 700; letter-spacing: 0.05em; }
+
+  .avisos { list-style: none; display: grid; gap: 6px; font-size: 14px; }
+  .avisos li { padding-left: 24px; position: relative; }
+  .avisos li::before { content: "⚠️"; position: absolute; left: 0; top: 0; font-size: 14px; }
+  .avisos li.dica::before { content: "📍"; }
+  .avisos li.recado { font-weight: 700; color: var(--profundo); }
+
+  .checklist { list-style: none; display: grid; gap: 6px; font-size: 14px; }
+  .checklist label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+  .checklist input { width: 20px; height: 20px; accent-color: var(--profundo); flex-shrink: 0; margin-top: 1px; }
+
+  /* ---------- rodapé, estados ---------- */
+  .rodape {
+    max-width: 640px; margin: 0 auto; padding: 24px 16px calc(32px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--linha); font-size: 14px; color: var(--suave);
+  }
+  .rodape p + p { margin-top: 6px; }
+  .rodape a { color: var(--profundo); font-weight: 700; text-decoration: none; }
+  .tagline { margin-top: 18px; font-size: 11px; letter-spacing: 0.18em; color: var(--laranja); text-transform: uppercase; }
+  .estado { text-align: center; padding: 48px 16px; color: var(--suave); }
+  .estado h2 { font-family: 'Outfit', sans-serif; color: var(--profundo); font-size: 20px; margin-bottom: 8px; }
+  .aviso-amostra {
+    background: var(--amarelo); color: var(--noite); font-size: 13px; font-weight: 600;
+    padding: 8px 16px; text-align: center;
+  }
+  .pin { max-width: 320px; margin: 48px auto; text-align: center; padding: 0 16px; }
+  .pin h2 { font-family: 'Outfit', sans-serif; color: var(--profundo); margin-bottom: 8px; }
+  .pin input {
+    width: 100%; font-size: 28px; text-align: center; letter-spacing: 0.3em;
+    padding: 12px; border: 2px solid var(--profundo); background: var(--branco); margin: 16px 0 12px;
+    font-family: 'Outfit', sans-serif;
+  }
+  .pin button {
+    width: 100%; background: var(--profundo); color: var(--areia); border: 0; border-radius: 999px;
+    padding: 14px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; font-size: 13px;
+  }
+  .pin .erro { color: var(--laranja); font-weight: 700; font-size: 14px; min-height: 20px; }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <svg class="marca-dagua" viewBox="0 0 412.18 320.88" aria-hidden="true"><use href="#simbolo-nomades"/></svg>
+  <div class="topo-linha">
+    <div class="logo">
+      <svg viewBox="0 0 412.18 320.88" aria-hidden="true"><use href="#simbolo-nomades"/></svg>
+      <div class="logo-texto">
+        <span class="logo-nome">Nômades</span>
+        <span class="logo-sub">Limpezas da semana</span>
+      </div>
+    </div>
+    <button class="btn-atualizar" id="btnAtualizar" type="button" aria-label="Atualizar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+      Atualizar
+    </button>
+  </div>
+  <div class="atualizado" id="atualizado">Carregando…</div>
+  <nav class="dias" id="dias" aria-label="Dias"></nav>
+</header>
+
+<div id="avisoAmostra"></div>
+<main id="conteudo"><div class="estado">Carregando o cronograma…</div></main>
+
+<footer class="rodape">
+  <p>Alguma dúvida ou problema no imóvel? Chama no WhatsApp:</p>
+  <p><a href="https://wa.me/5521991333527">Joca · (21) 99133-3527</a></p>
+  <p><a href="https://wa.me/5521971305743">Julia · (21) 97130-5743</a></p>
+  <p class="tagline">Gestão de imóveis por temporada</p>
+</footer>
+
+<!-- símbolo da marca (marca/provisorio/simbolo.svg) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="simbolo-nomades" viewBox="0 0 412.18 320.88"><g transform="translate(-799.561,-227.122)">
+  <g><path fill="currentColor" fill-rule="nonzero" d="M 1135.445312 321.839844 C 1135.753906 320.777344 1136.101562 319.71875 1136.457031 318.675781 C 1136.09375 319.71875 1135.746094 320.777344 1135.445312 321.839844 M 1147.957031 297.761719 C 1147.667969 297.730469 1147.371094 297.703125 1147.082031 297.671875 C 1147.285156 297.914062 1147.285156 297.914062 1147.574219 298.261719 C 1147.300781 298.617188 1147.050781 298.964844 1146.792969 299.332031 C 1147.167969 298.8125 1147.5625 298.289062 1147.957031 297.761719 M 947.445312 405.476562 C 944.816406 396.261719 927.707031 375.257812 916.070312 395.210938 C 916.070312 395.21875 916.0625 395.230469 916.050781 395.242188 C 884.050781 456.160156 845.386719 469.546875 824.886719 472.0625 C 820.578125 472.585938 816.683594 474.464844 813.695312 477.289062 C 810.695312 480.113281 808.605469 483.871094 807.863281 488.140625 C 805.703125 499.890625 815.417969 510.476562 827.285156 509.222656 C 837.144531 508.191406 849.511719 505.558594 863.199219 499.632812 C 887.671875 489.046875 917.613281 471.871094 945.238281 419.828125 C 947.042969 416.425781 948.023438 412.628906 947.910156 408.78125 C 947.859375 407.578125 947.726562 406.441406 947.445312 405.476562 "/><path fill="currentColor" fill-rule="nonzero" d="M 941.882812 329.175781 C 933.316406 319.738281 927 310.898438 924.824219 303.417969 C 921.449219 291.765625 921.207031 282.261719 924.160156 277.335938 C 926.105469 274.097656 929.527344 272.890625 931.492188 272.457031 C 931.628906 272.449219 931.984375 272.417969 932.503906 272.417969 C 934.578125 272.417969 939.234375 272.890625 942.328125 276.890625 C 945.125 280.496094 951.386719 293.335938 941.882812 329.175781 M 1203.441406 285.671875 L 1194.410156 264.824219 C 1193.617188 263.003906 1191.546875 262.113281 1189.695312 262.808594 C 1178.898438 266.855469 1143.746094 277.5 1121.296875 255.03125 C 1118.625 252.371094 1114.085938 252.148438 1111.183594 254.566406 L 1099.519531 264.304688 C 1096.082031 267.167969 1095.945312 272.351562 1099.136719 275.484375 C 1105.082031 281.296875 1111.761719 286.019531 1119.089844 289.636719 C 1088.96875 303.28125 1038.515625 333.386719 1009.136719 390.585938 C 1002.640625 384.800781 996.007812 379.054688 989.414062 373.359375 C 983.679688 368.394531 977.800781 363.304688 972.015625 358.179688 C 980.191406 334.003906 984.265625 313.367188 984.265625 296.121094 C 984.265625 278.039062 979.785156 263.667969 970.820312 252.832031 C 955.949219 234.847656 934.375 233.757812 923.976562 235.945312 C 910.558594 238.769531 898.960938 246.867188 892.195312 258.152344 C 883.546875 272.542969 882.488281 291.261719 889.015625 313.800781 C 894.363281 332.230469 909.3125 350.304688 928.3125 368.644531 L 957.558594 395.085938 C 960.023438 397.226562 962.519531 399.375 965.007812 401.535156 C 974.734375 409.949219 984.566406 418.460938 993.683594 426.875 C 985.839844 449.355469 983.035156 467.320312 983.035156 481.519531 C 983.035156 500.691406 988.140625 513 992.90625 520.308594 C 1001.085938 532.867188 1013.78125 540 1027.867188 540 C 1028.191406 540 1028.519531 539.988281 1028.855469 539.988281 C 1043.671875 539.632812 1056.886719 531.796875 1065.121094 518.484375 C 1075.800781 501.210938 1076.117188 477.980469 1065.9375 456.363281 C 1062.789062 449.683594 1058.605469 443.03125 1053.621094 436.410156 C 1052.617188 435.089844 1051.125 434.152344 1049.464844 433.980469 C 1036.820312 432.628906 1030.371094 462.847656 1035.09375 480.257812 C 1035.101562 480.304688 1035.113281 480.34375 1035.132812 480.390625 C 1035.140625 480.441406 1035.152344 480.5 1035.160156 480.535156 C 1037.089844 488.632812 1035.769531 495.070312 1033.417969 498.878906 C 1032.355469 500.605469 1030.542969 502.65625 1027.972656 502.726562 C 1027.429688 502.734375 1025.964844 502.765625 1024.132812 499.941406 C 1019.855469 493.386719 1018.292969 479.417969 1023.316406 458.039062 C 1023.316406 458.039062 1031.546875 428.753906 1039.777344 412.734375 C 1064.832031 363.953125 1092.371094 346.445312 1118.066406 332.035156 C 1121.71875 321.335938 1127.195312 313.566406 1132.640625 308.054688 C 1137.960938 302.65625 1143.234375 299.40625 1146.707031 297.625 C 1146.792969 297.585938 1146.871094 297.539062 1146.945312 297.511719 C 1146.996094 297.578125 1147.042969 297.625 1147.082031 297.671875 C 1147.371094 297.703125 1147.667969 297.730469 1147.957031 297.761719 C 1147.5625 298.289062 1147.167969 298.8125 1146.792969 299.332031 C 1146.464844 299.785156 1146.144531 300.246094 1145.828125 300.691406 C 1145.566406 301.058594 1145.328125 301.421875 1145.085938 301.769531 C 1144.835938 302.144531 1144.574219 302.523438 1144.335938 302.90625 C 1143.996094 303.417969 1143.660156 303.929688 1143.339844 304.449219 C 1141.722656 307.050781 1140.296875 309.675781 1139.0625 312.316406 C 1138.589844 313.316406 1138.15625 314.320312 1137.742188 315.332031 C 1137.519531 315.863281 1137.308594 316.402344 1137.09375 316.953125 C 1136.875 317.519531 1136.660156 318.097656 1136.457031 318.675781 C 1136.101562 319.71875 1135.753906 320.777344 1135.445312 321.839844 C 1135.292969 322.378906 1135.128906 322.917969 1134.992188 323.46875 C 1134.019531 327.109375 1133.421875 330.785156 1133.179688 334.457031 C 1132.835938 339.75 1133.210938 345.058594 1134.355469 350.351562 C 1135.300781 354.765625 1139.976562 357.320312 1144.226562 355.777344 L 1158.78125 350.535156 C 1162.078125 349.339844 1164.035156 346.003906 1163.542969 342.542969 C 1159.746094 315.929688 1191.757812 295.976562 1201.839844 290.40625 C 1203.507812 289.480469 1204.191406 287.4375 1203.441406 285.671875 "/></g>
+  </g></symbol>
+</svg>
+
+<script>
+/* =====================================================================
+   CONFIGURAÇÃO
+   A lista de IMÓVEIS (apelido, endereço, camas, notas) fica em Code.gs,
+   no Apps Script, e chega aqui junto com os dados, só depois do PIN.
+   ===================================================================== */
+// Endereço da "ponte" (Apps Script) que entrega os dados da planilha.
+var API_URL = 'https://script.google.com/macros/s/AKfycby9ZNNWqNrj6Dt4cnNEKU_fiWwUYbZflzFyOkGc89m-IwjkLBEvGHKaXKGvo9lIjN6dMA/exec';
+
+// Preenchido pelo servidor depois do PIN (a lista mora em Code.gs, não aqui,
+// para que endereços e notas dos imóveis não fiquem no código público).
+var IMOVEIS = {};
+
+// Vale para toda saída (_contexto/operacao.md).
+var CHECKLIST_GERAL = [
+  'Deslogar as contas de streaming da TV'
+];
+
+// Até quantos dias depois da saída a próxima entrada define os kits.
+// Além disso, monta todas as camas fixas (quem aparecer de última hora entra).
+var JANELA_KITS = 7;
+
+/* =====================================================================
+   REGRAS — espelham a skill gerar-cronograma-de-limpezas
+   ===================================================================== */
+
+function normalizar(s) {
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
+function acharImovel(nome) {
+  if (IMOVEIS[nome]) return IMOVEIS[nome];
+  var n = normalizar(nome);
+  for (var k in IMOVEIS) if (normalizar(k) === n) return IMOVEIS[k];
+  // Imóvel novo, ainda não configurado aqui: aparece com o nome da planilha.
+  return { apelido: nome, chave: [], endereco: '', bairro: '', camas: [1, 0, 0], kit: 'fixas', notas: [] };
+}
+
+function acharAnuncio(imovel, anuncios) {
+  if (!imovel.chave.length) return null;
+  for (var i = 0; i < anuncios.length; i++) {
+    var end = normalizar(anuncios[i].endereco);
+    var ok = imovel.chave.every(function (c) { return end.indexOf(c) !== -1; });
+    if (ok) return anuncios[i];
+  }
+  return null;
+}
+
+function diasEntre(a, b) {
+  return Math.round((Date.parse(b + 'T12:00:00Z') - Date.parse(a + 'T12:00:00Z')) / 86400000);
+}
+
+function minutos(hhmm) {
+  if (!hhmm) return null;
+  var p = hhmm.split(':');
+  return Number(p[0]) * 60 + Number(p[1] || 0);
+}
+
+function horaCurta(hhmm) {
+  var p = hhmm.split(':');
+  var h = String(Number(p[0]));
+  return p[1] && p[1] !== '00' ? h + 'h' + p[1] : h + 'h';
+}
+
+function kit(n, tipo) {
+  var nome = tipo === 'casal'
+    ? (n === 1 ? 'Kit Casal' : 'Kits Casal')
+    : (n === 1 ? 'Kit Solteiro' : 'Kits Solteiros');
+  return { qt: n, nome: nome };
+}
+
+/** Kits a montar e a guardar, segundo a regra de ouro:
+ *  cama fixa se monta; cama auxiliar e sofá-cama não — o kit fica no armário. */
+function calcularKits(imovel, camas, proxima) {
+  var casal = camas[0], solteiro = camas[1], sofa = camas[2];
+  var montar = [], guardar = [];
+  var usaProxima = !!proxima;
+
+  var nCasal = usaProxima && proxima.kitCasal != null ? proxima.kitCasal : casal;
+  if (nCasal > 0) montar.push(kit(nCasal, 'casal'));
+
+  var pedidoSolteiro = usaProxima && proxima.kitSolteiro != null ? proxima.kitSolteiro : null;
+
+  if (imovel.kit === 'sofaArmario') {
+    guardar.push(Object.assign(kit(1, 'solteiro'), { det: 'Não montar o sofá-cama' }));
+  } else if (imovel.kit === 'pedro') {
+    if (pedidoSolteiro > 0) {
+      montar.push(Object.assign(kit(1, 'solteiro'), { det: 'No sofá-cama — os próximos hóspedes vão usar' }));
+    } else {
+      guardar.push(Object.assign(kit(1, 'solteiro'), { det: 'Não montar o sofá-cama' }));
+    }
+  } else if (imovel.kit === 'bicama') {
+    // Porto Carioca 2303: as duas de solteiro são bicama (uma dentro da outra).
+    var nb = pedidoSolteiro == null ? 1 : Math.min(pedidoSolteiro, 2);
+    if (nb > 0) montar.push(Object.assign(kit(nb, 'solteiro'), {
+      det: nb === 1 ? 'Só a cama de cima da bicama' : 'As duas camas da bicama'
+    }));
+    if (nb < 2) guardar.push(Object.assign(kit(1, 'solteiro'), { det: 'Para o caso de virem 4 hóspedes' }));
+  } else {
+    var ns = pedidoSolteiro == null ? solteiro : Math.min(pedidoSolteiro, solteiro);
+    if (ns > 0) montar.push(kit(ns, 'solteiro'));
+    var extra = pedidoSolteiro == null ? 0 : Math.max(0, pedidoSolteiro - solteiro);
+    if (sofa > 0) guardar.push(Object.assign(kit(Math.max(1, extra), 'solteiro'), { det: 'Não montar o sofá-cama' }));
+  }
+  return { montar: montar, guardar: guardar, hospedes: usaProxima ? proxima.hospedes : null };
+}
+
+function montarCronograma(dados) {
+  var hoje = dados.hoje;
+  var dias = [];
+  for (var i = 0; i <= 7; i++) dias.push({ data: somar(hoje, i), limpezas: [] });
+
+  dados.checkouts.forEach(function (co) {
+    var imovel = acharImovel(co.anuncio);
+    var anuncio = acharAnuncio(imovel, dados.anuncios || []);
+
+    var camas = imovel.camas.slice();
+    if (anuncio && anuncio.camasCasal != null) {
+      camas = [anuncio.camasCasal, anuncio.camasSolteiro || 0, anuncio.sofas || 0];
+    }
+
+    // Próxima entrada no mesmo imóvel a partir do dia da saída.
+    var proxima = dados.checkins
+      .filter(function (ci) { return normalizar(ci.anuncio) === normalizar(co.anuncio) && ci.data >= co.data; })
+      .sort(function (a, b) { return (a.data + a.horario).localeCompare(b.data + b.horario); })[0] || null;
+    var proximaNaJanela = proxima && diasEntre(co.data, proxima.data) <= JANELA_KITS ? proxima : null;
+    var entradaMesmoDia = proxima && proxima.data === co.data ? proxima : null;
+
+    // Horário: início ou prazo.
+    var saida = co.horario || '11:00';
+    var hora, prazo = false, ressalva = '';
+    if (co.combinado) {
+      hora = co.combinado;
+    } else if (minutos(saida) < minutos('11:00')) {
+      hora = 'a partir das ' + horaCurta(saida);
+      ressalva = 'Hóspede sai cedo — confirmar na manhã do dia';
+    } else if (entradaMesmoDia || minutos(saida) > minutos('11:00')) {
+      hora = 'a partir das ' + horaCurta(saida);
+    } else {
+      hora = 'até as 15h';
+      prazo = true;
+    }
+
+    var avisos = [];
+    if (co.recado) avisos.push({ texto: co.recado, tipo: 'recado' });
+    imovel.notas.forEach(function (n) { avisos.push({ texto: n }); });
+    if (anuncio && anuncio.observacoes) {
+      var jaTem = imovel.notas.some(function (n) { return normalizar(n).indexOf(normalizar(anuncio.observacoes)) !== -1; });
+      if (!jaTem) avisos.push({ texto: anuncio.observacoes });
+    }
+
+    var dia = dias.filter(function (d) { return d.data === co.data; })[0];
+    if (!dia) return;
+    dia.limpezas.push({
+      nomePlanilha: co.anuncio,
+      imovel: imovel,
+      anuncio: anuncio,
+      hora: hora,
+      prazo: prazo,
+      ressalva: ressalva,
+      prioridade: entradaMesmoDia ? 'Entrada às ' + horaCurta(entradaMesmoDia.horario || '15:00') : '',
+      entradaMin: entradaMesmoDia ? minutos(entradaMesmoDia.horario || '15:00') : 9999,
+      feito: co.limpezaRealizada === 'OK',
+      kits: calcularKits(imovel, camas, proximaNaJanela),
+      avisos: avisos
+    });
+  });
+
+  // Mesma rua no mesmo dia = uma viagem só.
+  dias.forEach(function (d) {
+    d.limpezas.sort(function (a, b) { return a.entradaMin - b.entradaMin; });
+    var mesmaRua = d.limpezas.filter(function (l) { return l.imovel.rua === 'milton-santos'; });
+    if (mesmaRua.length > 1) {
+      mesmaRua.forEach(function (l) {
+        var outros = mesmaRua.filter(function (o) { return o !== l; }).map(function (o) { return o.imovel.apelido; });
+        l.avisos.push({ texto: 'Mesma rua de ' + juntar(outros) + ' — dá pra fazer na mesma ida.', tipo: 'dica' });
+      });
+    }
+  });
+  return dias;
+}
+
+function juntar(lista) {
+  if (lista.length < 2) return lista.join('');
+  return lista.slice(0, -1).join(', ') + ' e ' + lista[lista.length - 1];
+}
+
+function somar(iso, n) {
+  var p = iso.split('-').map(Number);
+  return new Date(Date.UTC(p[0], p[1] - 1, p[2] + n)).toISOString().slice(0, 10);
+}
+
+/* =====================================================================
+   TELA
+   ===================================================================== */
+
+var SEMANA = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+var SEMANA_CURTA = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+
+function diaSemana(iso) { return new Date(iso + 'T12:00:00Z').getUTCDay(); }
+function ddmm(iso) { return iso.slice(8, 10) + '/' + iso.slice(5, 7); }
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function telefoneLink(txt) {
+  // "Portaria: (21) 3597-9383" → link tel: mantendo o texto.
+  return esc(txt).replace(/\(?\d{2}\)?\s?\d{4,5}-?\d{4}/g, function (num) {
+    var d = num.replace(/\D/g, '');
+    return '<a href="tel:+55' + d + '">' + num + '</a>';
+  });
+}
+
+function mapaLink(end) {
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(end + ', Rio de Janeiro - RJ');
+}
+
+function renderizar(dados) {
+  var dias = montarCronograma(dados);
+  var hoje = dados.hoje;
+
+  var g = dados.geradoEm || '';
+  document.getElementById('atualizado').textContent =
+    'Atualizado em ' + ddmm(g.slice(0, 10)) + ' às ' + g.slice(11, 16) + ' · puxa direto da planilha';
+
+  document.getElementById('dias').innerHTML = dias.map(function (d, i) {
+    var n = d.limpezas.filter(function (l) { return !l.feito; }).length;
+    var rot = i === 0 ? 'hoje' : SEMANA_CURTA[diaSemana(d.data)];
+    return '<button type="button" class="dia-chip' + (n ? ' tem' : '') + (i === 0 ? ' ativo' : '') +
+      '" data-alvo="dia-' + d.data + '"><span class="sem">' + rot + '</span><span class="num">' +
+      d.data.slice(8, 10) + '</span><span class="qtd">' + n + '</span></button>';
+  }).join('');
+
+  document.getElementById('conteudo').innerHTML = dias.map(function (d, i) {
+    var rotulo = i === 0 ? 'Hoje' : i === 1 ? 'Amanhã' : cap(SEMANA[diaSemana(d.data)]);
+    var sub = (i <= 1 ? SEMANA[diaSemana(d.data)] + ', ' : '') + ddmm(d.data);
+    var n = d.limpezas.length;
+    var corpo = n ? d.limpezas.map(cartao).join('') : '<div class="vazio">Nenhuma limpeza neste dia.</div>';
+    return '<section class="dia" id="dia-' + d.data + '"><div class="dia-titulo"><h2>' + rotulo +
+      ' <small>· ' + sub + '</small></h2><span class="conta">' + (n ? n + (n === 1 ? ' limpeza' : ' limpezas') : '') +
+      '</span></div>' + corpo + '</section>';
+  }).join('');
+
+  ligarChips();
+  restaurarChecklist();
+}
+
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function cartao(l) {
+  var im = l.imovel, an = l.anuncio;
+  var endereco = im.endereco || (an && an.endereco) || '';
+  var bairro = (an && an.bairro) || im.bairro;
+  var classes = 'card' + (l.feito ? ' feito' : l.prioridade ? ' critico' : '');
+
+  var tags = '<span class="tag tag-hora' + (l.prazo ? ' prazo' : '') + '">' + esc(l.hora) + '</span>';
+  if (l.feito) tags += '<span class="tag tag-feito">✓ Feita</span>';
+  else if (l.prioridade) tags += '<span class="tag tag-prioridade">⚠️ ' + esc(l.prioridade) + '</span>';
+  if (l.ressalva) tags += '<span class="ressalva">' + esc(l.ressalva) + '</span>';
+
+  var h = '<article class="' + classes + '"><div class="card-topo"><div class="horario-linha">' + tags + '</div>' +
+    '<div class="imovel">' + esc(im.apelido) + '</div>' +
+    '<div class="endereco">' + esc(endereco) + (bairro ? ' · ' + esc(bairro) : '') +
+    (endereco ? ' &nbsp;<a href="' + mapaLink(endereco) + '" target="_blank" rel="noopener">Mapa</a>' : '') +
+    '</div></div>';
+
+  // Enxoval
+  var k = l.kits;
+  var itens = k.montar.map(function (x) {
+    return '<li><span class="qt">' + x.qt + '</span><span><b>' + esc(x.nome) + '</b> — montar' +
+      (x.det ? '<span class="det">' + esc(x.det) + '</span>' : '') + '</span></li>';
+  }).concat(k.guardar.map(function (x) {
+    return '<li class="armario"><span class="qt">' + x.qt + '</span><span><b>' + esc(x.nome) + '</b> — guardado no armário' +
+      (x.det ? '<span class="det">' + esc(x.det) + '</span>' : '') + '</span></li>';
+  }));
+  h += '<div class="bloco"><div class="bloco-rotulo">🧺 Enxoval a deixar</div><ul class="kits">' + itens.join('') + '</ul>' +
+    (k.hospedes ? '<div class="hospedes">Próxima reserva: ' + k.hospedes + (k.hospedes === 1 ? ' hóspede' : ' hóspedes') + '</div>' : '') +
+    '</div>';
+
+  // Acesso
+  if (an) {
+    var linhas = [];
+    if (an.tipoAcesso) linhas.push('<div>🔑 ' + esc(an.tipoAcesso) + (an.condominio && an.condominio !== 'N/A' ? ' · ' + esc(an.condominio) : '') + '</div>');
+    if (an.senha && an.senha !== '-') linhas.push('<div>Senha: <span class="senha">' + esc(an.senha) + '</span></div>');
+    if (an.portaria && an.portaria !== 'N/A') linhas.push('<div>☎️ ' + telefoneLink(an.portaria) + '</div>');
+    if (linhas.length) h += '<div class="bloco"><div class="bloco-rotulo">Acesso</div><div class="acesso">' + linhas.join('') + '</div></div>';
+  }
+
+  // Atenção
+  if (l.avisos.length) {
+    h += '<div class="bloco"><div class="bloco-rotulo">Atenção</div><ul class="avisos">' +
+      l.avisos.map(function (a) { return '<li' + (a.tipo ? ' class="' + a.tipo + '"' : '') + '>' + esc(a.texto) + '</li>'; }).join('') +
+      '</ul></div>';
+  }
+
+  // Checklist (fica salvo só neste celular)
+  if (!l.feito) {
+    h += '<div class="bloco"><div class="bloco-rotulo">Antes de sair</div><ul class="checklist">' +
+      CHECKLIST_GERAL.map(function (c, i) {
+        var id = 'ck|' + l.nomePlanilha + '|' + i;
+        return '<li><label><input type="checkbox" data-ck="' + esc(id) + '"> ' + esc(c) + '</label></li>';
+      }).join('') + '</ul></div>';
+  }
+  return h + '</article>';
+}
+
+/* ---------- interações ---------- */
+
+function ligarChips() {
+  var chips = document.querySelectorAll('.dia-chip');
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () {
+      chips.forEach(function (x) { x.classList.remove('ativo'); });
+      c.classList.add('ativo');
+      var alvo = document.getElementById(c.getAttribute('data-alvo'));
+      if (alvo) alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+}
+
+function guardar(chave, valor) { try { localStorage.setItem(chave, valor); } catch (e) {} }
+function ler(chave) { try { return localStorage.getItem(chave); } catch (e) { return null; } }
+function apagar(chave) { try { localStorage.removeItem(chave); } catch (e) {} }
+
+function restaurarChecklist() {
+  document.querySelectorAll('[data-ck]').forEach(function (el) {
+    var id = el.getAttribute('data-ck') + '|' + DADOS_HOJE;
+    el.checked = ler(id) === '1';
+    el.addEventListener('change', function () { el.checked ? guardar(id, '1') : apagar(id); });
+  });
+}
+
+/* ---------- carregar ---------- */
+
+var PREVIA_LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) || location.protocol === 'file:';
+var DADOS_HOJE = '';
+
+function mostrarErro(msg) {
+  document.getElementById('conteudo').innerHTML =
+    '<div class="estado"><h2>Não deu pra carregar</h2><p>' + esc(msg) +
+    '</p><p style="margin-top:8px">Tenta de novo no botão Atualizar. Se continuar, avisa o Joca ou a Julia.</p></div>';
+  document.getElementById('atualizado').textContent = 'Sem conexão com a planilha';
+}
+
+function pedirPin(erro) {
+  document.getElementById('dias').innerHTML = '';
+  document.getElementById('atualizado').textContent = 'Acesso da equipe';
+  document.getElementById('conteudo').innerHTML =
+    '<form class="pin" id="formPin"><h2>Digite o PIN da equipe</h2>' +
+    '<input id="campoPin" inputmode="numeric" autocomplete="off" maxlength="8" aria-label="PIN">' +
+    '<div class="erro">' + (erro ? 'PIN errado. Tenta de novo.' : '') + '</div>' +
+    '<button type="submit">Entrar</button></form>';
+  var campo = document.getElementById('campoPin');
+  campo.focus();
+  document.getElementById('formPin').addEventListener('submit', function (e) {
+    e.preventDefault();
+    guardar('nomades-pin', campo.value.trim());
+    carregar();
+  });
+}
+
+function receber(dados) {
+  var btn = document.getElementById('btnAtualizar');
+  btn.disabled = false; btn.classList.remove('girando');
+  if (dados && dados.erro === 'PIN') { apagar('nomades-pin'); pedirPin(ler('nomades-pin-tentou') === '1'); guardar('nomades-pin-tentou', '1'); return; }
+  apagar('nomades-pin-tentou');
+  if (dados.erro) { mostrarErro(dados.mensagem || dados.erro); return; }
+  if (dados.imoveis) IMOVEIS = dados.imoveis;
+  DADOS_HOJE = dados.hoje;
+  try { renderizar(dados); } catch (e) { mostrarErro(e.message); }
+}
+
+function carregar() {
+  var btn = document.getElementById('btnAtualizar');
+  btn.disabled = true; btn.classList.add('girando');
+
+  if (!PREVIA_LOCAL) {
+    // text/plain evita a checagem extra de CORS; o Apps Script lê o corpo cru.
+    fetch(API_URL, { method: 'POST', body: JSON.stringify({ pin: ler('nomades-pin') || '' }) })
+      .then(function (r) { if (!r.ok) throw new Error('Servidor respondeu ' + r.status); return r.json(); })
+      .then(receber)
+      .catch(function (e) { btn.disabled = false; btn.classList.remove('girando'); mostrarErro(e && e.message || String(e)); });
+    return;
+  }
+
+  // Prévia no computador (localhost): usa dados de exemplo.
+  var s = document.createElement('script');
+  s.src = 'amostra.js';
+  s.onload = function () {
+    document.getElementById('avisoAmostra').innerHTML =
+      '<div class="aviso-amostra">Prévia com dados de exemplo — no link publicado, os dados vêm da planilha.</div>';
+    setTimeout(function () { receber(window.AMOSTRA()); }, 300);
+  };
+  s.onerror = function () { mostrarErro('Arquivo de exemplo não encontrado.'); };
+  document.body.appendChild(s);
+}
+
+document.getElementById('btnAtualizar').addEventListener('click', carregar);
+carregar();
+</script>
+</body>
+</html>
