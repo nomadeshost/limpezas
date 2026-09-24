@@ -317,24 +317,27 @@ function kit(n, tipo) {
 }
 
 /** Kits a montar e a guardar, segundo a regra de ouro:
- *  cama fixa se monta; cama auxiliar e sofá-cama não — o kit fica no armário. */
+ *  cama fixa se monta; cama auxiliar e sofá-cama não — o kit fica no armário.
+ *  Sofá-cama usa Kit CASAL; cama de solteiro (fixa ou auxiliar) usa Kit Solteiro. */
 function calcularKits(imovel, camas, proxima) {
   var casal = camas[0], solteiro = camas[1], sofa = camas[2];
   var montar = [], guardar = [];
   var usaProxima = !!proxima;
 
-  var nCasal = usaProxima && proxima.kitCasal != null ? proxima.kitCasal : casal;
+  // Kit Casal montado nunca passa das camas de casal fixas; o do sofá-cama é à parte.
+  var nCasal = usaProxima && proxima.kitCasal != null ? Math.min(proxima.kitCasal, casal) : casal;
   if (nCasal > 0) montar.push(kit(nCasal, 'casal'));
 
   var pedidoSolteiro = usaProxima && proxima.kitSolteiro != null ? proxima.kitSolteiro : null;
 
   if (imovel.kit === 'sofaArmario') {
-    guardar.push(Object.assign(kit(1, 'solteiro'), { det: 'Não montar o sofá-cama' }));
+    guardar.push(Object.assign(kit(1, 'casal'), { det: 'Do sofá-cama — não montar o sofá-cama' }));
   } else if (imovel.kit === 'pedro') {
-    if (pedidoSolteiro > 0) {
-      montar.push(Object.assign(kit(1, 'solteiro'), { det: 'No sofá-cama — os próximos hóspedes vão usar' }));
+    // Pedro Américo: 1 casal + sofá-cama. Monta o sofá quando a cama de casal não comporta todos.
+    if (usaProxima && proxima.hospedes > 2) {
+      montar.push(Object.assign(kit(1, 'casal'), { det: 'No sofá-cama — os próximos hóspedes vão usar' }));
     } else {
-      guardar.push(Object.assign(kit(1, 'solteiro'), { det: 'Não montar o sofá-cama' }));
+      guardar.push(Object.assign(kit(1, 'casal'), { det: 'Do sofá-cama — não montar o sofá-cama' }));
     }
   } else if (imovel.kit === 'bicama') {
     // Porto Carioca 2303: as duas de solteiro são bicama (uma dentro da outra).
@@ -346,8 +349,7 @@ function calcularKits(imovel, camas, proxima) {
   } else {
     var ns = pedidoSolteiro == null ? solteiro : Math.min(pedidoSolteiro, solteiro);
     if (ns > 0) montar.push(kit(ns, 'solteiro'));
-    var extra = pedidoSolteiro == null ? 0 : Math.max(0, pedidoSolteiro - solteiro);
-    if (sofa > 0) guardar.push(Object.assign(kit(Math.max(1, extra), 'solteiro'), { det: 'Não montar o sofá-cama' }));
+    if (sofa > 0) guardar.push(Object.assign(kit(1, 'casal'), { det: 'Do sofá-cama — não montar o sofá-cama' }));
   }
   return { montar: montar, guardar: guardar, hospedes: usaProxima ? proxima.hospedes : null };
 }
