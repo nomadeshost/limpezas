@@ -126,7 +126,7 @@
   }
   .card.critico { border-left-color: var(--laranja); }
   .card.feito { border-left-color: var(--roxo); }
-  .card.feito .card-topo, .card.feito > .bloco { opacity: 0.62; }
+  .card.feito .card-topo, .card.feito > .bloco:not(.bloco-ck) { opacity: 0.62; }
   .card-topo { padding: 14px 16px 0; }
   .horario-linha { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
   .tag {
@@ -175,25 +175,78 @@
   .avisos li.dica::before { content: "📍"; }
   .avisos li.recado { font-weight: 700; color: var(--profundo); }
 
-  /* ---------- checklist da limpeza ---------- */
-  .ck { border-top: 1px solid var(--linha); margin-top: 12px; }
-  .ck > summary {
-    list-style: none; cursor: pointer;
+  /* ---------- botão do checklist no cartão ---------- */
+  .bloco-ck { padding: 12px 16px 16px; }
+  .btn-ck {
+    width: 100%; min-height: 52px; border: 0; border-radius: 999px;
+    background: var(--amarelo); color: var(--noite);
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    padding: 14px 16px; font-weight: 700; color: var(--profundo);
+    padding: 12px 20px; font-weight: 700; font-size: 15px; text-align: left;
   }
-  .ck > summary::-webkit-details-marker { display: none; }
-  .ck > summary::after { content: "▾"; font-size: 14px; transition: transform .2s; }
-  .ck[open] > summary::after { transform: rotate(180deg); }
-  .ck-titulo { display: flex; align-items: center; gap: 8px; }
-  .ck-resumo { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--suave); white-space: nowrap; }
-  .ck-corpo { padding: 0 16px 16px; }
-  .ck-carregando { font-size: 14px; color: var(--suave); padding: 4px 0 8px; }
-  .ck-barra { height: 5px; background: var(--linha); border-radius: 3px; overflow: hidden; margin-bottom: 4px; }
-  .ck-barra i { display: block; height: 100%; background: var(--amarelo); transition: width .25s; }
-  @media (prefers-reduced-motion: reduce) { .ck-barra i, .ck > summary::after { transition: none; } }
+  .btn-ck small { display: block; font-size: 12px; font-weight: 600; opacity: .75; }
+  .btn-ck .seta { font-size: 20px; line-height: 1; }
+  .btn-ck.completo, .card.feito .btn-ck { background: var(--areia-clara); color: var(--profundo); box-shadow: inset 0 0 0 1.5px var(--linha); }
 
-  .ck-sec { margin-top: 18px; }
+  /* ---------- tela do checklist (tela cheia, por etapas) ---------- */
+  body.com-tela { overflow: hidden; }
+  .tela-ck {
+    position: fixed; inset: 0; z-index: 30;
+    background: var(--branco);
+    display: flex; flex-direction: column;
+  }
+  .tela-ck[hidden] { display: none; }
+  .tck-topo {
+    flex: 0 0 auto; background: var(--noite); color: var(--areia);
+    padding: calc(10px + env(safe-area-inset-top)) 0 0;
+  }
+  .tck-linha { max-width: 640px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 12px; }
+  .tck-voltar {
+    flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; border: 0;
+    background: rgba(232, 228, 221, .12); color: var(--areia); font-size: 22px; line-height: 1;
+  }
+  .tck-id { min-width: 0; }
+  .tck-imovel {
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 19px; color: var(--amarelo); line-height: 1.15;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .tck-imovel:focus { outline: none; }
+  .tck-sub { font-size: 13px; opacity: .8; }
+  .tck-topo .ck-barra { max-width: 608px; margin: 10px auto 0; background: rgba(232, 228, 221, .18); }
+  .tck-etapas {
+    max-width: 640px; margin: 0 auto; display: flex; gap: 6px; overflow-x: auto;
+    padding: 10px 16px 12px; scrollbar-width: none;
+  }
+  .tck-etapas::-webkit-scrollbar { display: none; }
+  .tck-etapa {
+    flex: 0 0 34px; height: 34px; border-radius: 50%;
+    border: 1.5px solid rgba(232, 228, 221, .35); background: transparent; color: var(--areia);
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px;
+  }
+  .tck-etapa.completa { background: rgba(232, 228, 221, .18); border-color: transparent; color: var(--amarelo); }
+  .tck-etapa.atual { background: var(--amarelo); border-color: var(--amarelo); color: var(--noite); }
+  .tck-corpo { flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  .tck-conteudo { max-width: 640px; margin: 0 auto; padding: 16px 16px 32px; }
+  .tck-conteudo > .ck-sec { margin-top: 0; }
+  .tck-conteudo > .ck-sec.escuro { margin-top: -16px; padding-top: 18px; padding-bottom: 16px; }
+  .tck-rodape {
+    flex: 0 0 auto; border-top: 1px solid var(--linha); background: var(--branco);
+    padding: 8px 16px calc(10px + env(safe-area-inset-bottom));
+  }
+  .tck-rodape .ck-salvo { max-width: 608px; margin: 0 auto 8px; text-align: center; }
+  .tck-nav { max-width: 608px; margin: 0 auto; display: grid; grid-template-columns: auto 1fr; gap: 8px; }
+  .tck-nav button {
+    min-height: 50px; border: 0; border-radius: 999px; padding: 0 18px; font-weight: 700; font-size: 15px;
+  }
+  .tck-nav [data-etapa-ant] { background: var(--areia-clara); color: var(--profundo); box-shadow: inset 0 0 0 1.5px var(--linha); }
+  .tck-nav [data-etapa-ant]:disabled { opacity: .4; }
+  .tck-nav [data-etapa-prox] { background: var(--profundo); color: var(--areia); }
+  .ck-carregando { font-size: 15px; color: var(--suave); padding: 32px 0; text-align: center; }
+  .ck-carregando button { margin-top: 12px; border: 0; background: var(--profundo); color: var(--areia); border-radius: 999px; padding: 10px 18px; font-weight: 700; }
+  .ck-barra { height: 5px; background: var(--linha); border-radius: 3px; overflow: hidden; }
+  .ck-barra i { display: block; height: 100%; background: var(--amarelo); transition: width .25s; }
+  @media (prefers-reduced-motion: reduce) { .ck-barra i { transition: none; } }
+
+  .ck-sec { margin-top: 16px; }
   .ck-sec h3 {
     font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 17px; color: var(--profundo);
     display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
@@ -216,6 +269,7 @@
     background: var(--noite); color: var(--areia); border-left: 6px solid var(--amarelo);
     padding: 14px 14px 10px; margin-left: -16px; margin-right: -16px;
   }
+  .ck-sec.escuro .fotos { margin: 4px 0 8px; }
   .ck-sec.escuro h3 { color: var(--areia); }
   .ck-sec.escuro h3 .n { color: var(--amarelo); }
   .ck-sec.escuro.completa h3 .n { background: var(--amarelo); color: var(--noite); border-color: var(--amarelo); }
@@ -229,7 +283,7 @@
   .fotos { margin-top: 10px; }
   .fotos-rotulo { font-size: 14px; font-weight: 700; }
   .fotos-dica { font-size: 13px; opacity: .8; margin-bottom: 8px; }
-  .fotos-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; }
+  .fotos-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
   .foto { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: rgba(127, 127, 127, .2); }
   .foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .foto .st {
@@ -259,13 +313,13 @@
   .seg button[aria-pressed="true"][data-v="baixo"] { background: var(--amarelo); color: var(--noite); }
   .seg button[aria-pressed="true"][data-v="acabou"] { background: #b3261e; color: #fff; }
   @media (max-width: 380px) { .ins { grid-template-columns: 1fr; } .seg button { flex: 1; } }
-  .ck textarea {
+  .tela-ck textarea {
     width: 100%; font: inherit; font-size: 15px; padding: 10px; margin-top: 12px;
     border: 1.5px solid var(--linha); border-radius: 8px; background: var(--areia-clara); color: var(--texto);
   }
-  .ck label.rot { display: block; font-size: 13px; font-weight: 700; color: var(--suave); margin-top: 14px; }
+  .tela-ck label.rot { display: block; font-size: 13px; font-weight: 700; color: var(--suave); margin-top: 14px; }
 
-  .ck-fim { margin-top: 22px; padding-top: 14px; border-top: 2px solid var(--profundo); }
+  .ck-fim { margin-top: 16px; }
   .ck-fim h3 { font-family: 'Outfit', sans-serif; font-size: 18px; color: var(--profundo); }
   .falta { color: #b3261e; font-size: 14px; font-weight: 600; margin-top: 6px; }
   pre.msg {
@@ -283,7 +337,7 @@
   .ck-salvo.erro { color: #b3261e; font-weight: 700; }
   .ck-salvo button { border: 0; background: none; color: inherit; text-decoration: underline; font-weight: 700; }
   .toast {
-    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 20;
+    position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 40;
     background: var(--noite); color: var(--areia); padding: 10px 16px; border-radius: 10px;
     font-weight: 600; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s;
   }
@@ -340,6 +394,27 @@
 
 <div id="avisoAmostra"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="tela-ck" id="telaCk" hidden role="dialog" aria-modal="true" aria-labelledby="tckImovel">
+  <header class="tck-topo">
+    <div class="tck-linha">
+      <button type="button" class="tck-voltar" data-fechar aria-label="Voltar para o cronograma">←</button>
+      <div class="tck-id">
+        <div class="tck-imovel" id="tckImovel" tabindex="-1"></div>
+        <div class="tck-sub" id="tckSub"></div>
+      </div>
+    </div>
+    <div class="ck-barra"><i data-barra style="width:0%"></i></div>
+    <nav class="tck-etapas" id="tckEtapas" aria-label="Etapas do checklist"></nav>
+  </header>
+  <div class="tck-corpo" id="tckCorpo"><div class="tck-conteudo" id="tckConteudo"></div></div>
+  <footer class="tck-rodape" id="tckRodape">
+    <p class="ck-salvo" data-salvo></p>
+    <div class="tck-nav">
+      <button type="button" data-etapa-ant>←</button>
+      <button type="button" data-etapa-prox>Próxima →</button>
+    </div>
+  </footer>
+</div>
 <main id="conteudo"><div class="estado">Carregando o cronograma…</div></main>
 
 <footer class="rodape">
@@ -370,18 +445,21 @@ var API_URL = 'https://script.google.com/macros/s/AKfycby9ZNNWqNrj6Dt4cnNEKU_fiW
 var IMOVEIS = {};
 
 /* =====================================================================
-   CHECKLIST DA LIMPEZA — o mesmo do artifact "Checklist de limpeza".
-   Os vídeos de antes/depois continuam indo pelo grupo do WhatsApp;
-   no app ficam as FOTOS, na pasta do cliente no Drive por 90 dias (Code.gs).
+   CHECKLIST DA LIMPEZA — abre em tela cheia, uma etapa por vez.
+   O registro de antes e depois é só por FOTO (vídeo não: pesa demais no
+   Drive). As fotos ficam na pasta do cliente por 90 dias (Code.gs).
    A chave de cada item é "<id da seção>-<posição>": ao reordenar ou
    tirar item, marcações de limpezas em andamento podem trocar de lugar.
    ===================================================================== */
 var CK_SECOES = [
-  { id: 'antes', escuro: true, titulo: 'Antes de começar', sub: 'Antes de encostar em qualquer coisa', itens: [
-    ['Gravar o vídeo de antes, cômodo por cômodo, do jeito que o hóspede deixou', 'Abrir geladeira, armários, box e olhar embaixo das camas'],
-    ['Mostrar no vídeo a roupa de cama e as toalhas antes de retirar', 'Principalmente se tiver mancha ou rasgo'],
-    ['Mandar o vídeo no grupo', 'Se tiver dano, avisar na hora, antes de limpar']
-  ], fotos: { secao: 'antes', rotulo: 'Fotos de antes', dica: 'Uma por cômodo, e de perto em qualquer dano, mancha ou item faltando.' } },
+  { id: 'antes', escuro: true, titulo: 'Fotos de antes', sub: 'Antes de encostar em qualquer coisa: fotografar do jeito que o hóspede deixou.',
+    fotos: { secao: 'antes', rotulo: 'Fotos de antes', dica: 'Uma por cômodo, de um canto que pegue o ambiente inteiro. De perto em qualquer dano, mancha ou item faltando.' },
+    itens: [
+      ['Fotografar todos os cômodos', 'Quartos, banheiro, cozinha, sala e varanda'],
+      ['Fotografar de perto roupa de cama e toalhas antes de retirar', 'Principalmente se tiver mancha ou rasgo'],
+      ['Abrir geladeira, armários e box e olhar embaixo das camas', 'Fotografar o que estiver fora do normal'],
+      ['Achou dano? Avisar no grupo na hora, antes de limpar', 'Sem dano, é só marcar']
+    ] },
   { id: 'retirada', titulo: 'Retirada', sub: 'Tirar o que é do hóspede e o que vai pra lavar', itens: [
     ['Abrir janelas para ventilar', ''],
     ['Procurar itens esquecidos pelo hóspede', 'Guardar e avisar no grupo'],
@@ -411,24 +489,26 @@ var CK_SECOES = [
     ['Verificar se tem lixo no ralo da pia e jogar fora', ''],
     ['Passar pano no chão', '']
   ] },
-  { id: 'sala', titulo: 'Sala e áreas comuns', itens: [
+  { id: 'sala', titulo: 'Sala e áreas comuns', curto: 'Sala', itens: [
     ['Tirar pó de móveis, rack, TV e mesa', ''],
     ['Conferir controles (TV e ar-condicionado) com pilha funcionando', ''],
     ['Limpar maçanetas, interruptores e controles', ''],
     ['Varrer e passar pano', '']
   ] },
-  { id: 'arrumacao', titulo: 'Arrumação final', sub: 'Deixar igual às fotos do anúncio', itens: [
-    ['Arrumar as camas com o enxoval indicado acima', ''],
+  { id: 'arrumacao', titulo: 'Arrumação final', curto: 'Arrumação', sub: 'Deixar igual às fotos do anúncio', itens: [
+    ['Arrumar as camas com o enxoval indicado', 'Está no alto desta etapa'],
     ['Colocar toalhas limpas (banho e rosto) para o nº de hóspedes da próxima reserva', ''],
     ['Repor amenities no banheiro (papel, sabonete)', ''],
     ['Deixar kit cozinha no lugar (detergente, esponja)', ''],
     ['Testar ar-condicionado, Wi-Fi, TV e luzes', 'Queimou algo? Anotar em problemas']
   ] },
-  { id: 'insumos', titulo: 'Insumos e problemas', sub: 'Olhar o estoque antes de ir embora', insumos: true },
-  { id: 'depois', escuro: true, titulo: 'Antes de trancar', sub: 'Com tudo pronto', itens: [
-    ['Gravar o vídeo de depois mostrando todos os cômodos prontos', 'Camas, toalhas, banheiro, cozinha e armários abertos'],
-    ['Mandar o vídeo no grupo', '']
-  ], fotos: { secao: 'depois', rotulo: 'Fotos de depois', dica: 'Camas, banheiro, cozinha e sala prontos — igual às fotos do anúncio.' } },
+  { id: 'insumos', titulo: 'Insumos e problemas', curto: 'Insumos', sub: 'Olhar o estoque antes de ir embora', insumos: true },
+  { id: 'depois', escuro: true, titulo: 'Fotos de depois', sub: 'Com tudo pronto, antes de trancar.',
+    fotos: { secao: 'depois', rotulo: 'Fotos de depois', dica: 'Os mesmos cômodos das fotos de antes, prontos — igual às fotos do anúncio.' },
+    itens: [
+      ['Fotografar todos os cômodos prontos', 'Camas feitas, toalhas, banheiro, cozinha e sala'],
+      ['Fotografar de perto as camas com o enxoval montado', '']
+    ] },
   { id: 'saida', titulo: 'Saída', itens: [
     // Vale para toda saída (_contexto/operacao.md).
     ['Deslogar as contas de streaming da TV', ''],
@@ -436,7 +516,7 @@ var CK_SECOES = [
     ['Fechar e travar todas as janelas', ''],
     ['Levar o saco de enxoval sujo e o lixo', ''],
     ['Trancar a porta e conferir chave/fechadura', ''],
-    ['Mandar a mensagem final no grupo (abaixo)', '']
+    ['Mandar a mensagem final no grupo', 'Está na próxima etapa']
   ] }
 ];
 
@@ -676,10 +756,21 @@ function renderizar(dados) {
   }).join('');
 
   ligarChips();
-  reabrirChecklists();
 }
 
 function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function listaKits(k) {
+  var itens = k.montar.map(function (x) {
+    return '<li><span class="qt">' + x.qt + '</span><span><b>' + esc(x.nome) + '</b> — montar' +
+      (x.det ? '<span class="det">' + esc(x.det) + '</span>' : '') + '</span></li>';
+  }).concat(k.guardar.map(function (x) {
+    return '<li class="armario"><span class="qt">' + x.qt + '</span><span><b>' + esc(x.nome) + '</b> — guardado no armário' +
+      (x.det ? '<span class="det">' + esc(x.det) + '</span>' : '') + '</span></li>';
+  }));
+  return '<ul class="kits">' + itens.join('') + '</ul>' +
+    (k.hospedes ? '<div class="hospedes">Próxima reserva: ' + k.hospedes + (k.hospedes === 1 ? ' hóspede' : ' hóspedes') + '</div>' : '');
+}
 
 function cartao(l) {
   var im = l.imovel, an = l.anuncio;
@@ -699,17 +790,7 @@ function cartao(l) {
     '</div></div>';
 
   // Enxoval
-  var k = l.kits;
-  var itens = k.montar.map(function (x) {
-    return '<li><span class="qt">' + x.qt + '</span><span><b>' + esc(x.nome) + '</b> — montar' +
-      (x.det ? '<span class="det">' + esc(x.det) + '</span>' : '') + '</span></li>';
-  }).concat(k.guardar.map(function (x) {
-    return '<li class="armario"><span class="qt">' + x.qt + '</span><span><b>' + esc(x.nome) + '</b> — guardado no armário' +
-      (x.det ? '<span class="det">' + esc(x.det) + '</span>' : '') + '</span></li>';
-  }));
-  h += '<div class="bloco"><div class="bloco-rotulo">🧺 Enxoval a deixar</div><ul class="kits">' + itens.join('') + '</ul>' +
-    (k.hospedes ? '<div class="hospedes">Próxima reserva: ' + k.hospedes + (k.hospedes === 1 ? ' hóspede' : ' hóspedes') + '</div>' : '') +
-    '</div>';
+  h += '<div class="bloco"><div class="bloco-rotulo">🧺 Enxoval a deixar</div>' + listaKits(l.kits) + '</div>';
 
   // Acesso
   if (an) {
@@ -726,12 +807,10 @@ function cartao(l) {
       '</ul></div>';
   }
 
-  // Checklist (salvo no Drive, compartilhado entre os celulares)
+  // Checklist (salvo no Drive, compartilhado entre os celulares): abre em tela cheia.
   var id = l.data + '|' + l.nomePlanilha;
-  CK_INFO[id] = { apelido: im.apelido, data: l.data };
-  h += '<details class="ck" data-ck="' + esc(id) + '"><summary><span class="ck-titulo">📋 Checklist da limpeza</span>' +
-    '<span class="ck-resumo" data-resumo>' + resumoCk(id) + '</span></summary>' +
-    '<div class="ck-corpo"><div class="ck-carregando">Carregando…</div></div></details>';
+  CK_INFO[id] = { apelido: im.apelido, data: l.data, kits: l.kits };
+  h += '<div class="bloco bloco-ck">' + botaoCk(id) + '</div>';
   return h + '</article>';
 }
 
@@ -754,18 +833,22 @@ function ler(chave) { try { return localStorage.getItem(chave); } catch (e) { re
 function apagar(chave) { try { localStorage.removeItem(chave); } catch (e) {} }
 
 /* ---------- checklist da limpeza ----------
+   Abre em tela cheia, uma etapa por vez (feito para o celular):
+   topo com o imóvel, a barra de progresso e as etapas; embaixo Voltar/Próxima.
+   O botão Voltar do celular fecha a tela e volta ao cronograma.
    Estado no servidor (Drive): checks, sup (insumos), problemas, fotos.
-   Enquanto o checklist está aberto, marcações locais mandam; do servidor
+   Enquanto a tela está aberta, marcações locais mandam; do servidor
    só voltam as fotos (que ganham id e nome lá). */
 
 var CK = {};         // id → estado carregado
-var CK_INFO = {};    // id → { apelido, data }
-var CK_ABERTOS = {}; // checklists abertos, para reabrir depois de Atualizar
+var CK_INFO = {};    // id → { apelido, data, kits }
 var CK_PEND = {};    // id → { campo: valor } ainda não confirmados pelo servidor
 var CK_ENVIO = {};   // id → fotos na fila de envio
 var CK_ENVIANDO = {};
 var CK_SEQ = 0;
 var FOTO_ROTULO = { antes: 'de antes', depois: 'de depois', problema: 'do problema' };
+var ETAPAS = CK_SECOES.concat([{ id: 'fim', titulo: 'Mandar no grupo', fim: true }]);
+var TELA = { id: null, etapa: 0, empurrou: false, origem: null };
 
 function pinAtual() { return ler('nomades-pin') || ''; }
 
@@ -792,10 +875,9 @@ function chamar(fn, args, ok, falha) {
   }, 250);
 }
 
-function detsDe(id) {
-  return Array.prototype.filter.call(document.querySelectorAll('details.ck'), function (d) {
-    return d.getAttribute('data-ck') === id;
-  });
+// A tela, se estiver mostrando esta limpeza.
+function telaDe(id) {
+  return TELA.id === id ? document.getElementById('telaCk') : null;
 }
 
 function contarCk(id) {
@@ -808,6 +890,8 @@ function contarCk(id) {
       total += sec.itens.length;
       feitos += sec.itens.filter(function (_, i) { return est.checks[sec.id + '-' + i]; }).length;
     }
+    // Etapa de foto só conta como feita com pelo menos uma foto.
+    if (sec.fotos) { total += 1; if (fotosDe(id, sec.fotos.secao).length) feitos += 1; }
   });
   return { total: total, feitos: feitos, pct: Math.round(feitos / total * 100) };
 }
@@ -816,58 +900,78 @@ function fotosDe(id, secao) {
   return (CK[id] ? CK[id].fotos : []).filter(function (f) { return f.secao === secao; });
 }
 
-function resumoCk(id) {
-  if (!CK[id]) return 'abrir';
-  var c = contarCk(id), n = CK[id].fotos.length;
-  return c.pct + '%' + (n ? ' · 📷 ' + n : '');
+function botaoCk(id) {
+  var titulo = 'Abrir checklist', sub = 'Fotos de antes e depois, insumos e problemas', completo = false;
+  if (CK[id]) {
+    var c = contarCk(id), n = CK[id].fotos.length;
+    var resumo = c.pct + '% feito' + (n ? ' · 📷 ' + n + (n === 1 ? ' foto' : ' fotos') : '');
+    if (c.pct === 100) { titulo = 'Checklist completo ✓'; sub = resumo; completo = true; }
+    else if (c.feitos || n) { titulo = 'Continuar checklist'; sub = resumo; }
+    else titulo = 'Iniciar checklist';
+  }
+  return '<button type="button" class="btn-ck' + (completo ? ' completo' : '') + '" data-abrir-ck="' + esc(id) + '">' +
+    '<span>📋 ' + titulo + '<small>' + esc(sub) + '</small></span><span class="seta" aria-hidden="true">→</span></button>';
+}
+
+function atualizarBotaoCard(id) {
+  Array.prototype.forEach.call(document.querySelectorAll('[data-abrir-ck]'), function (b) {
+    if (b.getAttribute('data-abrir-ck') === id) b.outerHTML = botaoCk(id);
+  });
 }
 
 function secaoCompleta(id, sec) {
   var est = CK[id];
+  if (sec.fim) return !mensagemCk(id).falta.length;
   if (sec.insumos) return INSUMOS.every(function (_, i) { return est.sup[i]; });
   var ok = sec.itens.every(function (_, i) { return est.checks[sec.id + '-' + i]; });
   return ok && (!sec.fotos || fotosDe(id, sec.fotos.secao).length > 0);
 }
 
-function corpoCk(id) {
-  var est = CK[id], c = contarCk(id);
-  var h = '<div class="ck-barra"><i data-barra style="width:' + c.pct + '%"></i></div>';
-  CK_SECOES.forEach(function (sec, n) {
-    h += '<section class="ck-sec' + (sec.escuro ? ' escuro' : '') + (secaoCompleta(id, sec) ? ' completa' : '') +
-      '" data-sec="' + sec.id + '"><h3><span class="n" aria-hidden="true">' + (n + 1) + '</span>' + esc(sec.titulo) + '</h3>';
-    if (sec.escuro) h += '<p class="obrig"><b aria-hidden="true"></b>Obrigatório</p>';
-    if (sec.sub) h += '<p class="ck-sub">' + esc(sec.sub) + '</p>';
-    if (sec.insumos) {
-      h += '<p class="dica-ins">Marque <b>Acabando</b> se só dá para mais 1 ou 2 estadias. Assim dá tempo de comprar.</p>';
-      INSUMOS.forEach(function (nome, i) {
-        var v = est.sup[i] || '';
-        h += '<div class="ins"><span>' + esc(nome) + '</span><div class="seg" role="group" aria-label="' + esc(nome) + '">' +
-          ['ok', 'baixo', 'acabou'].map(function (o) {
-            return '<button type="button" data-sup="' + i + '" data-v="' + o + '" aria-pressed="' + (v === o) + '">' + INSUMO_ROTULO[o] + '</button>';
-          }).join('') + '</div></div>';
-      });
-      var tid = 'prob-' + (++CK_SEQ);
-      h += '<label class="rot" for="' + tid + '">Problemas, danos ou manutenção</label>' +
-        '<textarea id="' + tid + '" rows="3" data-prob placeholder="Ex.: lâmpada do banheiro queimada, mancha no sofá">' + esc(est.problemas) + '</textarea>' +
-        '<div class="fotos" data-fotos="problema">' + gradeFotos(id, 'problema', 'Fotos do problema', 'Se tiver dano, quebra ou mancha.') + '</div>';
-    } else {
-      h += '<ul class="ck-itens">' + sec.itens.map(function (it, i) {
-        var k = sec.id + '-' + i;
-        return '<li><label><input type="checkbox" data-item="' + k + '"' + (est.checks[k] ? ' checked' : '') + '><span>' +
-          esc(it[0]) + (it[1] ? '<em>' + esc(it[1]) + '</em>' : '') + '</span></label></li>';
-      }).join('') + '</ul>';
-      if (sec.fotos) h += '<div class="fotos" data-fotos="' + sec.fotos.secao + '">' + gradeFotos(id, sec.fotos.secao, sec.fotos.rotulo, sec.fotos.dica) + '</div>';
-    }
-    h += '</section>';
-  });
-  var m = mensagemCk(id);
-  h += '<div class="ck-fim"><h3>Mandar no grupo</h3>' +
-    '<p class="falta" data-falta' + (m.falta.length ? '' : ' hidden') + '>' + esc(m.falta.length ? 'Falta: ' + m.falta.join(', ') + '.' : '') + '</p>' +
-    '<pre class="msg" data-msg>' + esc(m.texto) + '</pre>' +
-    '<div class="acoes"><button type="button" class="btn primario" data-copiar>Copiar mensagem</button>' +
-    '<a class="btn secundario" data-wa target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(m.texto) + '">Abrir no WhatsApp</a></div>' +
-    '<p class="ck-salvo" data-salvo>Salvo na pasta do cliente · guardado por 90 dias</p></div>';
-  return h;
+function primeiraIncompleta(id) {
+  for (var i = 0; i < CK_SECOES.length; i++) if (!secaoCompleta(id, CK_SECOES[i])) return i;
+  return ETAPAS.length - 1;
+}
+
+function corpoEtapa(id, n) {
+  var est = CK[id], sec = ETAPAS[n], info = CK_INFO[id] || {};
+  if (sec.fim) {
+    var m = mensagemCk(id);
+    return '<section class="ck-sec ck-fim" data-sec="fim"><h3><span class="n" aria-hidden="true">✓</span>Mandar no grupo</h3>' +
+      '<p class="ck-sub">Confira e mande no grupo da equipe. As fotos já estão salvas na pasta do cliente.</p>' +
+      '<p class="falta" data-falta' + (m.falta.length ? '' : ' hidden') + '>' + esc(m.falta.length ? 'Falta: ' + m.falta.join(', ') + '.' : '') + '</p>' +
+      '<pre class="msg" data-msg>' + esc(m.texto) + '</pre>' +
+      '<div class="acoes"><button type="button" class="btn primario" data-copiar>Copiar mensagem</button>' +
+      '<a class="btn secundario" data-wa target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(m.texto) + '">Abrir no WhatsApp</a></div></section>';
+  }
+  var h = '<section class="ck-sec' + (sec.escuro ? ' escuro' : '') + (secaoCompleta(id, sec) ? ' completa' : '') +
+    '" data-sec="' + sec.id + '"><h3><span class="n" aria-hidden="true">' + (n + 1) + '</span>' + esc(sec.titulo) + '</h3>';
+  if (sec.escuro) h += '<p class="obrig"><b aria-hidden="true"></b>Obrigatório</p>';
+  if (sec.sub) h += '<p class="ck-sub">' + esc(sec.sub) + '</p>';
+  if (sec.id === 'arrumacao' && info.kits) {
+    h += '<div class="bloco-rotulo" style="margin-top:10px">🧺 Enxoval a deixar</div>' + listaKits(info.kits);
+  }
+  if (sec.fotos) h += '<div class="fotos" data-fotos="' + sec.fotos.secao + '">' + gradeFotos(id, sec.fotos.secao, sec.fotos.rotulo, sec.fotos.dica) + '</div>';
+  if (sec.insumos) {
+    h += '<p class="dica-ins">Marque <b>Acabando</b> se só dá para mais 1 ou 2 estadias. Assim dá tempo de comprar.</p>';
+    INSUMOS.forEach(function (nome, i) {
+      var v = est.sup[i] || '';
+      h += '<div class="ins"><span>' + esc(nome) + '</span><div class="seg" role="group" aria-label="' + esc(nome) + '">' +
+        ['ok', 'baixo', 'acabou'].map(function (o) {
+          return '<button type="button" data-sup="' + i + '" data-v="' + o + '" aria-pressed="' + (v === o) + '">' + INSUMO_ROTULO[o] + '</button>';
+        }).join('') + '</div></div>';
+    });
+    var tid = 'prob-' + (++CK_SEQ);
+    h += '<label class="rot" for="' + tid + '">Problemas, danos ou manutenção</label>' +
+      '<textarea id="' + tid + '" rows="3" data-prob placeholder="Ex.: lâmpada do banheiro queimada, mancha no sofá">' + esc(est.problemas) + '</textarea>' +
+      '<div class="fotos" data-fotos="problema">' + gradeFotos(id, 'problema', 'Fotos do problema', 'Se tiver dano, quebra ou mancha.') + '</div>';
+  } else {
+    h += '<ul class="ck-itens">' + sec.itens.map(function (it, i) {
+      var k = sec.id + '-' + i;
+      return '<li><label><input type="checkbox" data-item="' + k + '"' + (est.checks[k] ? ' checked' : '') + '><span>' +
+        esc(it[0]) + (it[1] ? '<em>' + esc(it[1]) + '</em>' : '') + '</span></label></li>';
+    }).join('') + '</ul>';
+  }
+  return h + '</section>';
 }
 
 function gradeFotos(id, secao, rotulo, dica) {
@@ -883,26 +987,31 @@ function gradeFotos(id, secao, rotulo, dica) {
         ? '<button type="button" class="st erro" data-reenviar="' + e.tmp + '">Não foi · tocar p/ tentar</button>'
         : '<span class="st">' + (e.status === 'preparando' ? 'Preparando…' : 'Enviando…') + '</span>') + '</div>';
   });
-  return h + '<label class="btn-foto"><input type="file" accept="image/*" multiple data-add="' + secao + '" data-ckid="' + esc(id) + '" onchange="receberFotos(this)"><span aria-hidden="true">📷</span>Adicionar</label></div>';
+  // Câmera direto (uma por vez) ou várias da galeria. O handler fica no próprio
+  // campo (onchange) — ver receberFotos.
+  return h + '<label class="btn-foto"><input type="file" accept="image/*" capture="environment" data-add="' + secao + '" data-ckid="' + esc(id) + '" onchange="receberFotos(this)">' +
+    '<span aria-hidden="true">📷</span>Tirar foto</label>' +
+    '<label class="btn-foto"><input type="file" accept="image/*" multiple data-add="' + secao + '" data-ckid="' + esc(id) + '" onchange="receberFotos(this)">' +
+    '<span aria-hidden="true">🖼️</span>Da galeria</label></div>';
 }
 
 function mensagemCk(id) {
   var est = CK[id], info = CK_INFO[id] || {};
   var nA = fotosDe(id, 'antes').length, nD = fotosDe(id, 'depois').length, nP = fotosDe(id, 'problema').length;
-  var vidA = est.checks['antes-2'], vidD = est.checks['depois-1'];
   var acabou = [], baixo = [], semMarcar = 0;
   INSUMOS.forEach(function (nome, i) {
     var v = est.sup[i];
     if (v === 'acabou') acabou.push(nome); else if (v === 'baixo') baixo.push(nome); else if (!v) semMarcar++;
   });
   var t = '✅ Limpeza concluída\n🏠 ' + (info.apelido || '') + '\n📅 ' + (info.data ? ddmm(info.data) : '') + '\n\n' +
-    '🎥 Vídeo de antes: ' + (vidA ? 'enviado' : 'NÃO enviado') + '\n' +
-    '🎥 Vídeo de depois: ' + (vidD ? 'enviado' : 'NÃO enviado') + '\n' +
-    '📷 Fotos no app: ' + nA + ' de antes · ' + nD + ' de depois\n\n';
+    '📷 Fotos salvas: ' + nA + ' de antes · ' + nD + ' de depois\n\n';
   if (acabou.length || baixo.length) {
     t += '🛒 Comprar:\n' + acabou.map(function (x) { return '• ' + x + ' (acabou)\n'; }).join('') +
-      baixo.map(function (x) { return '• ' + x + ' (acabando)\n'; }).join('');
-  } else t += '🛒 Insumos: tudo OK\n';
+      baixo.map(function (x) { return '• ' + x + ' (acabando)\n'; }).join('') +
+      (semMarcar ? '• ' + semMarcar + (semMarcar === 1 ? ' insumo não conferido\n' : ' insumos não conferidos\n') : '');
+  } else if (semMarcar === INSUMOS.length) t += '🛒 Insumos: não conferidos\n';
+  else if (semMarcar) t += '🛒 Insumos: OK nos conferidos · ' + semMarcar + (semMarcar === 1 ? ' não conferido\n' : ' não conferidos\n');
+  else t += '🛒 Insumos: tudo OK\n';
   t += '\n⚠️ Problemas: ' + (String(est.problemas || '').trim() || 'nenhum') +
     (nP ? ' (' + nP + (nP === 1 ? ' foto' : ' fotos') + ' no app)' : '');
 
@@ -911,75 +1020,183 @@ function mensagemCk(id) {
     if (sec.itens) itensFalta += sec.itens.filter(function (_, i) { return !est.checks[sec.id + '-' + i]; }).length;
   });
   var falta = [];
-  if (!vidA) falta.push('vídeo de antes');
   if (!nA) falta.push('fotos de antes');
-  if (!vidD) falta.push('vídeo de depois');
   if (!nD) falta.push('fotos de depois');
   if (semMarcar) falta.push(semMarcar + (semMarcar === 1 ? ' insumo sem marcar' : ' insumos sem marcar'));
   if (itensFalta) falta.push(itensFalta + (itensFalta === 1 ? ' item do checklist' : ' itens do checklist'));
   return { texto: t, falta: falta, pct: c.pct };
 }
 
-function renderCk(id) {
-  detsDe(id).forEach(function (d) {
-    d.querySelector('.ck-corpo').innerHTML = corpoCk(id);
-    d.querySelector('[data-resumo]').textContent = resumoCk(id);
-  });
+/* ---------- a tela ---------- */
+
+function abrirCk(id, origem) {
+  TELA.id = id;
+  TELA.origem = origem || null;
+  var salva = ler('nomades-ck-etapa|' + id);
+  TELA.etapa = salva == null ? -1 : Math.max(0, Math.min(Number(salva) || 0, ETAPAS.length - 1));
+  var tela = document.getElementById('telaCk');
+  tela.hidden = false;
+  document.body.classList.add('com-tela');
+  empurrarHistorico();
+  statusSalvo(id, 'Salvo na pasta do cliente · guardado por 90 dias');
+  renderTela();
+  document.getElementById('tckImovel').focus();
+  carregarCk(id);
 }
 
-// Atualiza números, seções completas e mensagem sem redesenhar (não tira o foco do campo).
+function fecharTela() {
+  var id = TELA.id;
+  if (!id) return;
+  TELA.id = null;
+  TELA.empurrou = false;
+  document.getElementById('telaCk').hidden = true;
+  document.body.classList.remove('com-tela');
+  atualizarBotaoCard(id);
+  var volta = document.querySelector('[data-abrir-ck="' + (window.CSS && CSS.escape ? CSS.escape(id) : id) + '"]');
+  if (volta) volta.focus({ preventScroll: true });
+}
+
+// Fechar pelo ← da tela desfaz a entrada no histórico, para o Voltar do celular não "sobrar".
+function pedirFechar() {
+  if (!TELA.empurrou) { fecharTela(); return; }
+  var id = TELA.id;
+  TELA.empurrou = false;
+  try { history.back(); } catch (e) {}
+  setTimeout(function () { if (TELA.id === id) fecharTela(); }, 400);
+}
+
+function empurrarHistorico() {
+  try {
+    history.pushState({ ck: 1 }, '', '#checklist');
+    TELA.empurrou = true;
+  } catch (e) { TELA.empurrou = false; }
+}
+
+function aoMudarHistorico(estado) {
+  if (TELA.id && !(estado && estado.ck)) { TELA.empurrou = false; fecharTela(); }
+}
+
+function irEtapa(n) {
+  var id = TELA.id;
+  if (!id || !CK[id]) return;
+  TELA.etapa = Math.max(0, Math.min(n, ETAPAS.length - 1));
+  guardar('nomades-ck-etapa|' + id, String(TELA.etapa));
+  renderTela();
+  document.getElementById('tckCorpo').scrollTop = 0;
+}
+
+function subTela(id) {
+  var info = CK_INFO[id] || {};
+  var t = info.data ? cap(SEMANA_CURTA[diaSemana(info.data)]) + ', ' + ddmm(info.data) : '';
+  if (CK[id]) {
+    var c = contarCk(id), n = CK[id].fotos.length;
+    t += ' · ' + c.pct + '% feito' + (n ? ' · 📷 ' + n : '');
+  }
+  return t;
+}
+
+function renderTela() {
+  var id = TELA.id;
+  if (!id) return;
+  var tela = document.getElementById('telaCk');
+  tela.setAttribute('data-ck', id);
+  document.getElementById('tckImovel').textContent = (CK_INFO[id] || {}).apelido || '';
+  var conteudo = document.getElementById('tckConteudo');
+  var nav = document.getElementById('tckEtapas');
+  var ant = tela.querySelector('[data-etapa-ant]'), prox = tela.querySelector('[data-etapa-prox]');
+
+  if (!CK[id]) {
+    document.getElementById('tckSub').textContent = subTela(id);
+    tela.querySelector('[data-barra]').style.width = '0%';
+    nav.innerHTML = '';
+    conteudo.innerHTML = '<div class="ck-carregando">Carregando o checklist…</div>';
+    ant.disabled = true; prox.disabled = true;
+    return;
+  }
+  if (TELA.etapa < 0) TELA.etapa = primeiraIncompleta(id);
+  var n = TELA.etapa;
+
+  nav.innerHTML = ETAPAS.map(function (sec, i) {
+    return '<button type="button" class="tck-etapa' + (i === n ? ' atual' : '') + '" data-ir="' + i + '"' +
+      (i === n ? ' aria-current="step"' : '') + ' aria-label="' + esc((i + 1) + '. ' + sec.titulo) + '">' +
+      (sec.fim ? '✉' : i + 1) + '</button>';
+  }).join('');
+  conteudo.innerHTML = corpoEtapa(id, n);
+
+  ant.disabled = n === 0;
+  ant.textContent = '←';
+  ant.setAttribute('aria-label', 'Etapa anterior');
+  prox.disabled = false;
+  prox.textContent = n === ETAPAS.length - 1 ? 'Voltar ao cronograma'
+    : 'Próxima: ' + (ETAPAS[n + 1].curto || ETAPAS[n + 1].titulo) + ' →';
+  atualizarCk(id);
+
+  var atual = nav.querySelector('.atual');
+  if (atual) nav.scrollLeft = atual.offsetLeft - nav.clientWidth / 2 + atual.clientWidth / 2;
+}
+
+// Atualiza números, etapas completas e mensagem sem redesenhar (não tira o foco do campo).
 function atualizarCk(id) {
+  var tela = telaDe(id);
+  if (!tela || !CK[id]) return;
   var m = mensagemCk(id);
-  detsDe(id).forEach(function (d) {
-    d.querySelector('[data-resumo]').textContent = resumoCk(id);
-    var barra = d.querySelector('[data-barra]');
-    if (!barra) return;
-    barra.style.width = m.pct + '%';
-    CK_SECOES.forEach(function (sec) {
-      var el = d.querySelector('[data-sec="' + sec.id + '"]');
-      if (el) el.classList.toggle('completa', secaoCompleta(id, sec));
-    });
-    var f = d.querySelector('[data-falta]');
+  tela.querySelector('[data-barra]').style.width = m.pct + '%';
+  document.getElementById('tckSub').textContent = subTela(id);
+  Array.prototype.forEach.call(tela.querySelectorAll('[data-ir]'), function (b) {
+    var i = Number(b.getAttribute('data-ir'));
+    var ok = secaoCompleta(id, ETAPAS[i]);
+    b.classList.toggle('completa', ok);
+    if (i !== TELA.etapa && !ETAPAS[i].fim) b.textContent = ok ? '✓' : String(i + 1);
+  });
+  var sec = tela.querySelector('.ck-sec[data-sec]');
+  if (sec) sec.classList.toggle('completa', secaoCompleta(id, ETAPAS[TELA.etapa]));
+  var f = tela.querySelector('[data-falta]');
+  if (f) {
     f.hidden = !m.falta.length;
     f.textContent = m.falta.length ? 'Falta: ' + m.falta.join(', ') + '.' : '';
-    d.querySelector('[data-msg]').textContent = m.texto;
-    d.querySelector('[data-wa]').href = 'https://wa.me/?text=' + encodeURIComponent(m.texto);
-  });
+    tela.querySelector('[data-msg]').textContent = m.texto;
+    tela.querySelector('[data-wa]').href = 'https://wa.me/?text=' + encodeURIComponent(m.texto);
+  }
 }
 
 function atualizarFotos(id) {
-  detsDe(id).forEach(function (d) {
-    Array.prototype.forEach.call(d.querySelectorAll('[data-fotos]'), function (box) {
+  var tela = telaDe(id);
+  if (tela) {
+    Array.prototype.forEach.call(tela.querySelectorAll('[data-fotos]'), function (box) {
       var secao = box.getAttribute('data-fotos');
       var sec = CK_SECOES.filter(function (s) { return s.fotos && s.fotos.secao === secao; })[0];
       box.innerHTML = sec ? gradeFotos(id, secao, sec.fotos.rotulo, sec.fotos.dica)
         : gradeFotos(id, secao, 'Fotos do problema', 'Se tiver dano, quebra ou mancha.');
     });
-  });
+  }
   atualizarCk(id);
 }
 
 function statusSalvo(id, texto, erro) {
-  detsDe(id).forEach(function (d) {
-    var el = d.querySelector('[data-salvo]');
-    if (!el) return;
-    el.classList.toggle('erro', Boolean(erro));
-    el.innerHTML = esc(texto) + (erro ? ' <button type="button" data-retentar>Tentar de novo</button>' : '');
-  });
+  var tela = telaDe(id);
+  if (!tela) return;
+  var el = tela.querySelector('[data-salvo]');
+  el.classList.toggle('erro', Boolean(erro));
+  el.innerHTML = esc(texto) + (erro ? ' <button type="button" data-retentar>Tentar de novo</button>' : '');
 }
 
 function carregarCk(id) {
+  var tinha = !!CK[id];
   chamar('getChecklist', [pinAtual(), id], function (est) {
     var pend = CK_PEND[id] || {};
     Object.keys(pend).forEach(function (campo) { aplicarCampo(est, campo, pend[campo]); });
     CK[id] = est;
-    renderCk(id);
+    atualizarBotaoCard(id);
+    if (!telaDe(id)) return;
+    // Quem já está digitando não perde o campo: só atualiza os números.
+    var foco = document.activeElement;
+    if (tinha && foco && foco.tagName === 'TEXTAREA' && document.getElementById('telaCk').contains(foco)) atualizarFotos(id);
+    else renderTela();
   }, function (e) {
     if (CK[id]) { statusSalvo(id, 'Sem conexão — mostrando o que já estava neste celular.', true); return; }
-    detsDe(id).forEach(function (d) {
-      d.querySelector('.ck-corpo').innerHTML = '<div class="ck-carregando">Não deu pra abrir: ' + esc(e.message) +
-        ' <button type="button" class="btn-link" data-recarregar>Tentar de novo</button></div>';
-    });
+    if (!telaDe(id)) return;
+    document.getElementById('tckConteudo').innerHTML = '<div class="ck-carregando">Não deu pra abrir: ' + esc(e.message) +
+      '<br><button type="button" data-recarregar>Tentar de novo</button></div>';
   });
 }
 
@@ -1057,6 +1274,7 @@ function processarFila(id) {
     CK_ENVIO[id] = CK_ENVIO[id].filter(function (x) { return x !== item; });
     CK[id].fotos = est.fotos;
     atualizarFotos(id);
+    atualizarBotaoCard(id);
     processarFila(id);
   }, function (e) {
     CK_ENVIANDO[id] = false;
@@ -1102,28 +1320,10 @@ function copiarVelho(txt) {
   ta.remove();
 }
 
-// Depois de Atualizar, reabre o que estava aberto.
-function reabrirChecklists() {
-  Array.prototype.forEach.call(document.querySelectorAll('details.ck'), function (d) {
-    if (CK_ABERTOS[d.getAttribute('data-ck')]) d.open = true;
-  });
-}
-
 function idDoAlvo(el) {
-  var d = el.closest && el.closest('details.ck');
-  return d ? d.getAttribute('data-ck') : null;
+  var t = el.closest && el.closest('#telaCk');
+  return t && TELA.id ? TELA.id : null;
 }
-
-// "toggle" não borbulha: escuta na captura.
-document.addEventListener('toggle', function (e) {
-  var d = e.target;
-  if (!d.classList || !d.classList.contains('ck')) return;
-  var id = d.getAttribute('data-ck');
-  if (!d.open) { delete CK_ABERTOS[id]; return; }
-  CK_ABERTOS[id] = true;
-  if (CK[id]) renderCk(id);
-  carregarCk(id);
-}, true);
 
 document.addEventListener('change', function (e) {
   var t = e.target, id = idDoAlvo(t);
@@ -1159,11 +1359,19 @@ document.addEventListener('input', function (e) {
 document.addEventListener('click', function (e) {
   var b = e.target.closest && e.target.closest('button');
   if (!b) return;
+  if (b.hasAttribute('data-abrir-ck')) { abrirCk(b.getAttribute('data-abrir-ck')); return; }
   var id = idDoAlvo(b);
   if (!id) return;
+  if (b.hasAttribute('data-fechar')) { pedirFechar(); return; }
   if (b.hasAttribute('data-recarregar')) { carregarCk(id); return; }
   if (!CK[id]) return;
-  if (b.hasAttribute('data-sup')) {
+  if (b.hasAttribute('data-ir')) {
+    irEtapa(Number(b.getAttribute('data-ir')));
+  } else if (b.hasAttribute('data-etapa-ant')) {
+    irEtapa(TELA.etapa - 1);
+  } else if (b.hasAttribute('data-etapa-prox')) {
+    if (TELA.etapa === ETAPAS.length - 1) pedirFechar(); else irEtapa(TELA.etapa + 1);
+  } else if (b.hasAttribute('data-sup')) {
     var i = b.getAttribute('data-sup'), v = b.getAttribute('data-v');
     var novo = CK[id].sup[i] === v ? '' : v;
     if (novo) CK[id].sup[i] = novo; else delete CK[id].sup[i];
@@ -1185,6 +1393,11 @@ document.addEventListener('click', function (e) {
     copiar(mensagemCk(id).texto);
   }
 });
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && TELA.id) pedirFechar();
+});
+window.addEventListener('popstate', function (e) { aoMudarHistorico(e.state); });
 
 /* Prévia no computador: mesmo contrato do Code.gs, guardado neste navegador. */
 var AMOSTRA_API = {
