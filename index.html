@@ -125,7 +125,8 @@
     margin-bottom: 12px;
   }
   .card.critico { border-left-color: var(--laranja); }
-  .card.feito { border-left-color: var(--roxo); opacity: 0.62; }
+  .card.feito { border-left-color: var(--roxo); }
+  .card.feito .card-topo, .card.feito > .bloco { opacity: 0.62; }
   .card-topo { padding: 14px 16px 0; }
   .horario-linha { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
   .tag {
@@ -167,7 +168,6 @@
 
   .acesso { font-size: 14px; display: grid; gap: 4px; }
   .acesso a { color: var(--profundo); font-weight: 700; }
-  .senha { font-family: 'Outfit', sans-serif; font-weight: 700; letter-spacing: 0.05em; }
 
   .avisos { list-style: none; display: grid; gap: 6px; font-size: 14px; }
   .avisos li { padding-left: 24px; position: relative; }
@@ -175,9 +175,119 @@
   .avisos li.dica::before { content: "📍"; }
   .avisos li.recado { font-weight: 700; color: var(--profundo); }
 
-  .checklist { list-style: none; display: grid; gap: 6px; font-size: 14px; }
-  .checklist label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
-  .checklist input { width: 20px; height: 20px; accent-color: var(--profundo); flex-shrink: 0; margin-top: 1px; }
+  /* ---------- checklist da limpeza ---------- */
+  .ck { border-top: 1px solid var(--linha); margin-top: 12px; }
+  .ck > summary {
+    list-style: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 14px 16px; font-weight: 700; color: var(--profundo);
+  }
+  .ck > summary::-webkit-details-marker { display: none; }
+  .ck > summary::after { content: "▾"; font-size: 14px; transition: transform .2s; }
+  .ck[open] > summary::after { transform: rotate(180deg); }
+  .ck-titulo { display: flex; align-items: center; gap: 8px; }
+  .ck-resumo { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--suave); white-space: nowrap; }
+  .ck-corpo { padding: 0 16px 16px; }
+  .ck-carregando { font-size: 14px; color: var(--suave); padding: 4px 0 8px; }
+  .ck-barra { height: 5px; background: var(--linha); border-radius: 3px; overflow: hidden; margin-bottom: 4px; }
+  .ck-barra i { display: block; height: 100%; background: var(--amarelo); transition: width .25s; }
+  @media (prefers-reduced-motion: reduce) { .ck-barra i, .ck > summary::after { transition: none; } }
+
+  .ck-sec { margin-top: 18px; }
+  .ck-sec h3 {
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 17px; color: var(--profundo);
+    display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+  }
+  .ck-sec h3 .n {
+    flex: 0 0 24px; height: 24px; border-radius: 50%; border: 2px solid currentColor;
+    display: inline-grid; place-items: center; font-size: 12px;
+  }
+  .ck-sec.completa h3 .n { background: var(--profundo); color: var(--areia); border-color: var(--profundo); }
+  .ck-sub { font-size: 13px; color: var(--suave); margin-bottom: 4px; }
+  .ck-itens { list-style: none; }
+  .ck-itens li { border-bottom: 1px solid var(--linha); }
+  .ck-itens label { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; cursor: pointer; font-size: 15px; }
+  .ck-itens input { width: 22px; height: 22px; accent-color: var(--profundo); flex-shrink: 0; margin-top: 1px; }
+  .ck-itens input:checked + span { color: var(--suave); text-decoration: line-through; }
+  .ck-itens em { display: block; font-style: normal; font-size: 13px; color: var(--suave); }
+
+  /* antes/depois: o bloco que não pode passar batido */
+  .ck-sec.escuro {
+    background: var(--noite); color: var(--areia); border-left: 6px solid var(--amarelo);
+    padding: 14px 14px 10px; margin-left: -16px; margin-right: -16px;
+  }
+  .ck-sec.escuro h3 { color: var(--areia); }
+  .ck-sec.escuro h3 .n { color: var(--amarelo); }
+  .ck-sec.escuro.completa h3 .n { background: var(--amarelo); color: var(--noite); border-color: var(--amarelo); }
+  .ck-sec.escuro .ck-sub, .ck-sec.escuro .ck-itens em { color: #c8cfdb; }
+  .ck-sec.escuro .ck-itens li { border-color: rgba(232, 228, 221, .18); }
+  .ck-sec.escuro .ck-itens input { accent-color: var(--amarelo); }
+  .ck-sec.escuro .ck-itens input:checked + span { color: #aeb7c7; }
+  .obrig { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--amarelo); letter-spacing: .06em; text-transform: uppercase; }
+  .obrig b { width: 9px; height: 9px; border-radius: 50%; background: #e5372b; }
+
+  .fotos { margin-top: 10px; }
+  .fotos-rotulo { font-size: 14px; font-weight: 700; }
+  .fotos-dica { font-size: 13px; opacity: .8; margin-bottom: 8px; }
+  .fotos-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; }
+  .foto { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: rgba(127, 127, 127, .2); }
+  .foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .foto .st {
+    position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+    background: rgba(1, 17, 38, .55); color: #fff; font-size: 11px; font-weight: 700; padding: 4px;
+  }
+  .foto .st.erro { background: rgba(179, 38, 30, .8); }
+  .foto .x {
+    position: absolute; top: 3px; right: 3px; width: 26px; height: 26px; border-radius: 50%; border: 0;
+    background: rgba(1, 17, 38, .75); color: #fff; font-size: 15px; line-height: 1;
+  }
+  .btn-foto {
+    aspect-ratio: 1; border-radius: 8px; border: 2px dashed currentColor; opacity: .85;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    font-size: 12px; font-weight: 700; cursor: pointer; text-align: center;
+  }
+  .btn-foto span { font-size: 22px; line-height: 1; }
+  .btn-foto input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .btn-foto:focus-within { outline: 3px solid var(--roxo); outline-offset: 2px; }
+
+  .dica-ins { font-size: 13px; color: var(--suave); margin-bottom: 6px; }
+  .ins { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--linha); font-size: 15px; }
+  .seg { display: flex; border: 1.5px solid var(--linha); border-radius: 8px; overflow: hidden; }
+  .seg button { border: 0; background: var(--branco); padding: 8px 8px; font-size: 13px; font-weight: 700; min-width: 58px; color: var(--profundo); }
+  .seg button + button { border-left: 1.5px solid var(--linha); }
+  .seg button[aria-pressed="true"][data-v="ok"] { background: #1f7a4d; color: #fff; }
+  .seg button[aria-pressed="true"][data-v="baixo"] { background: var(--amarelo); color: var(--noite); }
+  .seg button[aria-pressed="true"][data-v="acabou"] { background: #b3261e; color: #fff; }
+  @media (max-width: 380px) { .ins { grid-template-columns: 1fr; } .seg button { flex: 1; } }
+  .ck textarea {
+    width: 100%; font: inherit; font-size: 15px; padding: 10px; margin-top: 12px;
+    border: 1.5px solid var(--linha); border-radius: 8px; background: var(--areia-clara); color: var(--texto);
+  }
+  .ck label.rot { display: block; font-size: 13px; font-weight: 700; color: var(--suave); margin-top: 14px; }
+
+  .ck-fim { margin-top: 22px; padding-top: 14px; border-top: 2px solid var(--profundo); }
+  .ck-fim h3 { font-family: 'Outfit', sans-serif; font-size: 18px; color: var(--profundo); }
+  .falta { color: #b3261e; font-size: 14px; font-weight: 600; margin-top: 6px; }
+  pre.msg {
+    white-space: pre-wrap; word-break: break-word; font-family: inherit; font-size: 14px;
+    background: var(--areia-clara); border: 1px solid var(--linha); border-radius: 8px; padding: 12px; margin: 10px 0;
+  }
+  .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .acoes .btn {
+    display: flex; justify-content: center; align-items: center; text-align: center; text-decoration: none;
+    border: 0; border-radius: 999px; padding: 12px; font-weight: 700; font-size: 14px;
+  }
+  .btn.primario { background: var(--amarelo); color: var(--noite); }
+  .btn.secundario { background: var(--profundo); color: var(--areia); }
+  .ck-salvo { font-size: 12px; color: var(--suave); margin-top: 10px; min-height: 16px; }
+  .ck-salvo.erro { color: #b3261e; font-weight: 700; }
+  .ck-salvo button { border: 0; background: none; color: inherit; text-decoration: underline; font-weight: 700; }
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 20;
+    background: var(--noite); color: var(--areia); padding: 10px 16px; border-radius: 10px;
+    font-weight: 600; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s;
+  }
+  .toast.mostra { opacity: 1; }
 
   /* ---------- rodapé, estados ---------- */
   .rodape {
@@ -229,6 +339,7 @@
 </header>
 
 <div id="avisoAmostra"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <main id="conteudo"><div class="estado">Carregando o cronograma…</div></main>
 
 <footer class="rodape">
@@ -258,10 +369,80 @@ var API_URL = 'https://script.google.com/macros/s/AKfycby9ZNNWqNrj6Dt4cnNEKU_fiW
 // para que endereços e notas dos imóveis não fiquem no código público).
 var IMOVEIS = {};
 
-// Vale para toda saída (_contexto/operacao.md).
-var CHECKLIST_GERAL = [
-  'Deslogar as contas de streaming da TV'
+/* =====================================================================
+   CHECKLIST DA LIMPEZA — o mesmo do artifact "Checklist de limpeza".
+   Os vídeos de antes/depois continuam indo pelo grupo do WhatsApp;
+   no app ficam as FOTOS, na pasta do cliente no Drive por 90 dias (Code.gs).
+   A chave de cada item é "<id da seção>-<posição>": ao reordenar ou
+   tirar item, marcações de limpezas em andamento podem trocar de lugar.
+   ===================================================================== */
+var CK_SECOES = [
+  { id: 'antes', escuro: true, titulo: 'Antes de começar', sub: 'Antes de encostar em qualquer coisa', itens: [
+    ['Gravar o vídeo de antes, cômodo por cômodo, do jeito que o hóspede deixou', 'Abrir geladeira, armários, box e olhar embaixo das camas'],
+    ['Mostrar no vídeo a roupa de cama e as toalhas antes de retirar', 'Principalmente se tiver mancha ou rasgo'],
+    ['Mandar o vídeo no grupo', 'Se tiver dano, avisar na hora, antes de limpar']
+  ], fotos: { secao: 'antes', rotulo: 'Fotos de antes', dica: 'Uma por cômodo, e de perto em qualquer dano, mancha ou item faltando.' } },
+  { id: 'retirada', titulo: 'Retirada', sub: 'Tirar o que é do hóspede e o que vai pra lavar', itens: [
+    ['Abrir janelas para ventilar', ''],
+    ['Procurar itens esquecidos pelo hóspede', 'Guardar e avisar no grupo'],
+    ['Tirar lençóis, fronhas, capas e toalhas e colocar no saco de sujos', ''],
+    ['Recolher todo o lixo (banheiros, cozinha, quartos)', 'Colocar saco novo em todas as lixeiras'],
+    ['Esvaziar a geladeira de restos do hóspede', '']
+  ] },
+  { id: 'quartos', titulo: 'Quartos', itens: [
+    ['Tirar pó de cabeceira, prateleiras e superfícies', ''],
+    ['Conferir colchão e travesseiros (manchas, cheiro)', 'Usar protetor limpo se o atual estiver sujo'],
+    ['Conferir armário: cabides no lugar, nada esquecido', ''],
+    ['Limpar espelhos', ''],
+    ['Varrer/aspirar e passar pano', '']
+  ] },
+  { id: 'banheiro', titulo: 'Banheiro', itens: [
+    ['Lavar o banheiro', ''],
+    ['Lavar vaso sanitário por dentro, por fora e na base', ''],
+    ['Limpar box, vidro e ralo', ''],
+    ['Limpar pia, torneira e espelho sem marcas', ''],
+    ['Conferir se descarga, chuveiro e torneiras funcionam', '']
+  ] },
+  { id: 'cozinha', titulo: 'Cozinha', itens: [
+    ['Lavar, secar e guardar a louça no lugar certo', ''],
+    ['Limpar fogão/cooktop, micro-ondas por dentro e bancadas', ''],
+    ['Limpar geladeira por dentro e por fora', ''],
+    ['Limpar pia e trocar a esponja se estiver gasta', ''],
+    ['Verificar se tem lixo no ralo da pia e jogar fora', ''],
+    ['Passar pano no chão', '']
+  ] },
+  { id: 'sala', titulo: 'Sala e áreas comuns', itens: [
+    ['Tirar pó de móveis, rack, TV e mesa', ''],
+    ['Conferir controles (TV e ar-condicionado) com pilha funcionando', ''],
+    ['Limpar maçanetas, interruptores e controles', ''],
+    ['Varrer e passar pano', '']
+  ] },
+  { id: 'arrumacao', titulo: 'Arrumação final', sub: 'Deixar igual às fotos do anúncio', itens: [
+    ['Arrumar as camas com o enxoval indicado acima', ''],
+    ['Colocar toalhas limpas (banho e rosto) para o nº de hóspedes da próxima reserva', ''],
+    ['Repor amenities no banheiro (papel, sabonete)', ''],
+    ['Deixar kit cozinha no lugar (detergente, esponja)', ''],
+    ['Testar ar-condicionado, Wi-Fi, TV e luzes', 'Queimou algo? Anotar em problemas']
+  ] },
+  { id: 'insumos', titulo: 'Insumos e problemas', sub: 'Olhar o estoque antes de ir embora', insumos: true },
+  { id: 'depois', escuro: true, titulo: 'Antes de trancar', sub: 'Com tudo pronto', itens: [
+    ['Gravar o vídeo de depois mostrando todos os cômodos prontos', 'Camas, toalhas, banheiro, cozinha e armários abertos'],
+    ['Mandar o vídeo no grupo', '']
+  ], fotos: { secao: 'depois', rotulo: 'Fotos de depois', dica: 'Camas, banheiro, cozinha e sala prontos — igual às fotos do anúncio.' } },
+  { id: 'saida', titulo: 'Saída', itens: [
+    // Vale para toda saída (_contexto/operacao.md).
+    ['Deslogar as contas de streaming da TV', ''],
+    ['Desligar ar-condicionado, luzes e TV', ''],
+    ['Fechar e travar todas as janelas', ''],
+    ['Levar o saco de enxoval sujo e o lixo', ''],
+    ['Trancar a porta e conferir chave/fechadura', ''],
+    ['Mandar a mensagem final no grupo (abaixo)', '']
+  ] }
 ];
+
+var INSUMOS = ['Papel higiênico', 'Sabonete', 'Detergente', 'Esponja', 'Sacos de lixo',
+  'Água sanitária', 'Desinfetante / multiuso', 'Álcool', 'Pilhas (controles)'];
+var INSUMO_ROTULO = { ok: 'OK', baixo: 'Acabando', acabou: 'Acabou' };
 
 // Até quantos dias depois da saída a próxima entrada define os kits.
 // Além disso, monta todas as camas fixas (quem aparecer de última hora entra).
@@ -402,6 +583,7 @@ function montarCronograma(dados) {
     if (!dia) return;
     dia.limpezas.push({
       nomePlanilha: co.anuncio,
+      data: co.data,
       imovel: imovel,
       anuncio: anuncio,
       hora: hora,
@@ -494,7 +676,7 @@ function renderizar(dados) {
   }).join('');
 
   ligarChips();
-  restaurarChecklist();
+  reabrirChecklists();
 }
 
 function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -533,7 +715,6 @@ function cartao(l) {
   if (an) {
     var linhas = [];
     if (an.tipoAcesso) linhas.push('<div>🔑 ' + esc(an.tipoAcesso) + (an.condominio && an.condominio !== 'N/A' ? ' · ' + esc(an.condominio) : '') + '</div>');
-    if (an.senha && an.senha !== '-') linhas.push('<div>Senha: <span class="senha">' + esc(an.senha) + '</span></div>');
     if (an.portaria && an.portaria !== 'N/A') linhas.push('<div>☎️ ' + telefoneLink(an.portaria) + '</div>');
     if (linhas.length) h += '<div class="bloco"><div class="bloco-rotulo">Acesso</div><div class="acesso">' + linhas.join('') + '</div></div>';
   }
@@ -545,14 +726,12 @@ function cartao(l) {
       '</ul></div>';
   }
 
-  // Checklist (fica salvo só neste celular)
-  if (!l.feito) {
-    h += '<div class="bloco"><div class="bloco-rotulo">Antes de sair</div><ul class="checklist">' +
-      CHECKLIST_GERAL.map(function (c, i) {
-        var id = 'ck|' + l.nomePlanilha + '|' + i;
-        return '<li><label><input type="checkbox" data-ck="' + esc(id) + '"> ' + esc(c) + '</label></li>';
-      }).join('') + '</ul></div>';
-  }
+  // Checklist (salvo no Drive, compartilhado entre os celulares)
+  var id = l.data + '|' + l.nomePlanilha;
+  CK_INFO[id] = { apelido: im.apelido, data: l.data };
+  h += '<details class="ck" data-ck="' + esc(id) + '"><summary><span class="ck-titulo">📋 Checklist da limpeza</span>' +
+    '<span class="ck-resumo" data-resumo>' + resumoCk(id) + '</span></summary>' +
+    '<div class="ck-corpo"><div class="ck-carregando">Carregando…</div></div></details>';
   return h + '</article>';
 }
 
@@ -574,13 +753,464 @@ function guardar(chave, valor) { try { localStorage.setItem(chave, valor); } cat
 function ler(chave) { try { return localStorage.getItem(chave); } catch (e) { return null; } }
 function apagar(chave) { try { localStorage.removeItem(chave); } catch (e) {} }
 
-function restaurarChecklist() {
-  document.querySelectorAll('[data-ck]').forEach(function (el) {
-    var id = el.getAttribute('data-ck') + '|' + DADOS_HOJE;
-    el.checked = ler(id) === '1';
-    el.addEventListener('change', function () { el.checked ? guardar(id, '1') : apagar(id); });
+/* ---------- checklist da limpeza ----------
+   Estado no servidor (Drive): checks, sup (insumos), problemas, fotos.
+   Enquanto o checklist está aberto, marcações locais mandam; do servidor
+   só voltam as fotos (que ganham id e nome lá). */
+
+var CK = {};         // id → estado carregado
+var CK_INFO = {};    // id → { apelido, data }
+var CK_ABERTOS = {}; // checklists abertos, para reabrir depois de Atualizar
+var CK_PEND = {};    // id → { campo: valor } ainda não confirmados pelo servidor
+var CK_ENVIO = {};   // id → fotos na fila de envio
+var CK_ENVIANDO = {};
+var CK_SEQ = 0;
+var FOTO_ROTULO = { antes: 'de antes', depois: 'de depois', problema: 'do problema' };
+
+function pinAtual() { return ler('nomades-pin') || ''; }
+
+function chamar(fn, args, ok, falha) {
+  var okPin = function (r) {
+    if (r && r.erro === 'PIN') falha(new Error('O PIN mudou. Toque em Atualizar e digite de novo.'));
+    else if (r && r.erro) falha(new Error(r.mensagem || r.erro));
+    else ok(r);
+  };
+  var falhaMsg = function (e) { falha(e instanceof Error ? e : new Error(e && e.message || String(e))); };
+  if (!PREVIA_LOCAL) {
+    // Mesmo formato do cronograma: POST em texto puro (sem checagem extra de CORS).
+    // O Apps Script recebe { acao, args } e devolve JSON.
+    fetch(API_URL, { method: 'POST', body: JSON.stringify({ acao: fn, args: args }) })
+      .then(function (r) { if (!r.ok) throw new Error('Servidor respondeu ' + r.status); return r.json(); })
+      .then(okPin)
+      .catch(function (e) {
+        falhaMsg(e && /fetch|network|load failed/i.test(e.message) ? new Error('Sem internet ou servidor fora do ar') : e);
+      });
+    return;
+  }
+  setTimeout(function () {
+    try { okPin(AMOSTRA_API[fn].apply(null, args)); } catch (e) { falhaMsg(e); }
+  }, 250);
+}
+
+function detsDe(id) {
+  return Array.prototype.filter.call(document.querySelectorAll('details.ck'), function (d) {
+    return d.getAttribute('data-ck') === id;
   });
 }
+
+function contarCk(id) {
+  var est = CK[id], total = 0, feitos = 0;
+  CK_SECOES.forEach(function (sec) {
+    if (sec.insumos) {
+      total += INSUMOS.length;
+      feitos += INSUMOS.filter(function (_, i) { return est.sup[i]; }).length;
+    } else {
+      total += sec.itens.length;
+      feitos += sec.itens.filter(function (_, i) { return est.checks[sec.id + '-' + i]; }).length;
+    }
+  });
+  return { total: total, feitos: feitos, pct: Math.round(feitos / total * 100) };
+}
+
+function fotosDe(id, secao) {
+  return (CK[id] ? CK[id].fotos : []).filter(function (f) { return f.secao === secao; });
+}
+
+function resumoCk(id) {
+  if (!CK[id]) return 'abrir';
+  var c = contarCk(id), n = CK[id].fotos.length;
+  return c.pct + '%' + (n ? ' · 📷 ' + n : '');
+}
+
+function secaoCompleta(id, sec) {
+  var est = CK[id];
+  if (sec.insumos) return INSUMOS.every(function (_, i) { return est.sup[i]; });
+  var ok = sec.itens.every(function (_, i) { return est.checks[sec.id + '-' + i]; });
+  return ok && (!sec.fotos || fotosDe(id, sec.fotos.secao).length > 0);
+}
+
+function corpoCk(id) {
+  var est = CK[id], c = contarCk(id);
+  var h = '<div class="ck-barra"><i data-barra style="width:' + c.pct + '%"></i></div>';
+  CK_SECOES.forEach(function (sec, n) {
+    h += '<section class="ck-sec' + (sec.escuro ? ' escuro' : '') + (secaoCompleta(id, sec) ? ' completa' : '') +
+      '" data-sec="' + sec.id + '"><h3><span class="n" aria-hidden="true">' + (n + 1) + '</span>' + esc(sec.titulo) + '</h3>';
+    if (sec.escuro) h += '<p class="obrig"><b aria-hidden="true"></b>Obrigatório</p>';
+    if (sec.sub) h += '<p class="ck-sub">' + esc(sec.sub) + '</p>';
+    if (sec.insumos) {
+      h += '<p class="dica-ins">Marque <b>Acabando</b> se só dá para mais 1 ou 2 estadias. Assim dá tempo de comprar.</p>';
+      INSUMOS.forEach(function (nome, i) {
+        var v = est.sup[i] || '';
+        h += '<div class="ins"><span>' + esc(nome) + '</span><div class="seg" role="group" aria-label="' + esc(nome) + '">' +
+          ['ok', 'baixo', 'acabou'].map(function (o) {
+            return '<button type="button" data-sup="' + i + '" data-v="' + o + '" aria-pressed="' + (v === o) + '">' + INSUMO_ROTULO[o] + '</button>';
+          }).join('') + '</div></div>';
+      });
+      var tid = 'prob-' + (++CK_SEQ);
+      h += '<label class="rot" for="' + tid + '">Problemas, danos ou manutenção</label>' +
+        '<textarea id="' + tid + '" rows="3" data-prob placeholder="Ex.: lâmpada do banheiro queimada, mancha no sofá">' + esc(est.problemas) + '</textarea>' +
+        '<div class="fotos" data-fotos="problema">' + gradeFotos(id, 'problema', 'Fotos do problema', 'Se tiver dano, quebra ou mancha.') + '</div>';
+    } else {
+      h += '<ul class="ck-itens">' + sec.itens.map(function (it, i) {
+        var k = sec.id + '-' + i;
+        return '<li><label><input type="checkbox" data-item="' + k + '"' + (est.checks[k] ? ' checked' : '') + '><span>' +
+          esc(it[0]) + (it[1] ? '<em>' + esc(it[1]) + '</em>' : '') + '</span></label></li>';
+      }).join('') + '</ul>';
+      if (sec.fotos) h += '<div class="fotos" data-fotos="' + sec.fotos.secao + '">' + gradeFotos(id, sec.fotos.secao, sec.fotos.rotulo, sec.fotos.dica) + '</div>';
+    }
+    h += '</section>';
+  });
+  var m = mensagemCk(id);
+  h += '<div class="ck-fim"><h3>Mandar no grupo</h3>' +
+    '<p class="falta" data-falta' + (m.falta.length ? '' : ' hidden') + '>' + esc(m.falta.length ? 'Falta: ' + m.falta.join(', ') + '.' : '') + '</p>' +
+    '<pre class="msg" data-msg>' + esc(m.texto) + '</pre>' +
+    '<div class="acoes"><button type="button" class="btn primario" data-copiar>Copiar mensagem</button>' +
+    '<a class="btn secundario" data-wa target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(m.texto) + '">Abrir no WhatsApp</a></div>' +
+    '<p class="ck-salvo" data-salvo>Salvo na pasta do cliente · guardado por 90 dias</p></div>';
+  return h;
+}
+
+function gradeFotos(id, secao, rotulo, dica) {
+  var h = '<div class="fotos-rotulo">📷 ' + esc(rotulo) + '</div>' + (dica ? '<div class="fotos-dica">' + esc(dica) + '</div>' : '') +
+    '<div class="fotos-grade">';
+  fotosDe(id, secao).forEach(function (f, i) {
+    h += '<div class="foto">' + (f.mini ? '<img src="' + esc(f.mini) + '" alt="Foto ' + FOTO_ROTULO[secao] + ' ' + (i + 1) + '">' : '<span class="st">📷</span>') +
+      '<button type="button" class="x" data-apagar="' + esc(f.id) + '" aria-label="Apagar foto">×</button></div>';
+  });
+  (CK_ENVIO[id] || []).filter(function (e) { return e.secao === secao; }).forEach(function (e) {
+    h += '<div class="foto">' + (e.mini ? '<img src="' + e.mini + '" alt="">' : '') +
+      (e.status === 'erro'
+        ? '<button type="button" class="st erro" data-reenviar="' + e.tmp + '">Não foi · tocar p/ tentar</button>'
+        : '<span class="st">' + (e.status === 'preparando' ? 'Preparando…' : 'Enviando…') + '</span>') + '</div>';
+  });
+  return h + '<label class="btn-foto"><input type="file" accept="image/*" multiple data-add="' + secao + '" data-ckid="' + esc(id) + '" onchange="receberFotos(this)"><span aria-hidden="true">📷</span>Adicionar</label></div>';
+}
+
+function mensagemCk(id) {
+  var est = CK[id], info = CK_INFO[id] || {};
+  var nA = fotosDe(id, 'antes').length, nD = fotosDe(id, 'depois').length, nP = fotosDe(id, 'problema').length;
+  var vidA = est.checks['antes-2'], vidD = est.checks['depois-1'];
+  var acabou = [], baixo = [], semMarcar = 0;
+  INSUMOS.forEach(function (nome, i) {
+    var v = est.sup[i];
+    if (v === 'acabou') acabou.push(nome); else if (v === 'baixo') baixo.push(nome); else if (!v) semMarcar++;
+  });
+  var t = '✅ Limpeza concluída\n🏠 ' + (info.apelido || '') + '\n📅 ' + (info.data ? ddmm(info.data) : '') + '\n\n' +
+    '🎥 Vídeo de antes: ' + (vidA ? 'enviado' : 'NÃO enviado') + '\n' +
+    '🎥 Vídeo de depois: ' + (vidD ? 'enviado' : 'NÃO enviado') + '\n' +
+    '📷 Fotos no app: ' + nA + ' de antes · ' + nD + ' de depois\n\n';
+  if (acabou.length || baixo.length) {
+    t += '🛒 Comprar:\n' + acabou.map(function (x) { return '• ' + x + ' (acabou)\n'; }).join('') +
+      baixo.map(function (x) { return '• ' + x + ' (acabando)\n'; }).join('');
+  } else t += '🛒 Insumos: tudo OK\n';
+  t += '\n⚠️ Problemas: ' + (String(est.problemas || '').trim() || 'nenhum') +
+    (nP ? ' (' + nP + (nP === 1 ? ' foto' : ' fotos') + ' no app)' : '');
+
+  var c = contarCk(id), itensFalta = 0;
+  CK_SECOES.forEach(function (sec) {
+    if (sec.itens) itensFalta += sec.itens.filter(function (_, i) { return !est.checks[sec.id + '-' + i]; }).length;
+  });
+  var falta = [];
+  if (!vidA) falta.push('vídeo de antes');
+  if (!nA) falta.push('fotos de antes');
+  if (!vidD) falta.push('vídeo de depois');
+  if (!nD) falta.push('fotos de depois');
+  if (semMarcar) falta.push(semMarcar + (semMarcar === 1 ? ' insumo sem marcar' : ' insumos sem marcar'));
+  if (itensFalta) falta.push(itensFalta + (itensFalta === 1 ? ' item do checklist' : ' itens do checklist'));
+  return { texto: t, falta: falta, pct: c.pct };
+}
+
+function renderCk(id) {
+  detsDe(id).forEach(function (d) {
+    d.querySelector('.ck-corpo').innerHTML = corpoCk(id);
+    d.querySelector('[data-resumo]').textContent = resumoCk(id);
+  });
+}
+
+// Atualiza números, seções completas e mensagem sem redesenhar (não tira o foco do campo).
+function atualizarCk(id) {
+  var m = mensagemCk(id);
+  detsDe(id).forEach(function (d) {
+    d.querySelector('[data-resumo]').textContent = resumoCk(id);
+    var barra = d.querySelector('[data-barra]');
+    if (!barra) return;
+    barra.style.width = m.pct + '%';
+    CK_SECOES.forEach(function (sec) {
+      var el = d.querySelector('[data-sec="' + sec.id + '"]');
+      if (el) el.classList.toggle('completa', secaoCompleta(id, sec));
+    });
+    var f = d.querySelector('[data-falta]');
+    f.hidden = !m.falta.length;
+    f.textContent = m.falta.length ? 'Falta: ' + m.falta.join(', ') + '.' : '';
+    d.querySelector('[data-msg]').textContent = m.texto;
+    d.querySelector('[data-wa]').href = 'https://wa.me/?text=' + encodeURIComponent(m.texto);
+  });
+}
+
+function atualizarFotos(id) {
+  detsDe(id).forEach(function (d) {
+    Array.prototype.forEach.call(d.querySelectorAll('[data-fotos]'), function (box) {
+      var secao = box.getAttribute('data-fotos');
+      var sec = CK_SECOES.filter(function (s) { return s.fotos && s.fotos.secao === secao; })[0];
+      box.innerHTML = sec ? gradeFotos(id, secao, sec.fotos.rotulo, sec.fotos.dica)
+        : gradeFotos(id, secao, 'Fotos do problema', 'Se tiver dano, quebra ou mancha.');
+    });
+  });
+  atualizarCk(id);
+}
+
+function statusSalvo(id, texto, erro) {
+  detsDe(id).forEach(function (d) {
+    var el = d.querySelector('[data-salvo]');
+    if (!el) return;
+    el.classList.toggle('erro', Boolean(erro));
+    el.innerHTML = esc(texto) + (erro ? ' <button type="button" data-retentar>Tentar de novo</button>' : '');
+  });
+}
+
+function carregarCk(id) {
+  chamar('getChecklist', [pinAtual(), id], function (est) {
+    var pend = CK_PEND[id] || {};
+    Object.keys(pend).forEach(function (campo) { aplicarCampo(est, campo, pend[campo]); });
+    CK[id] = est;
+    renderCk(id);
+  }, function (e) {
+    if (CK[id]) { statusSalvo(id, 'Sem conexão — mostrando o que já estava neste celular.', true); return; }
+    detsDe(id).forEach(function (d) {
+      d.querySelector('.ck-corpo').innerHTML = '<div class="ck-carregando">Não deu pra abrir: ' + esc(e.message) +
+        ' <button type="button" class="btn-link" data-recarregar>Tentar de novo</button></div>';
+    });
+  });
+}
+
+function aplicarCampo(est, campo, valor) {
+  var m;
+  if ((m = campo.match(/^check:(.+)$/))) { if (valor) est.checks[m[1]] = true; else delete est.checks[m[1]]; }
+  else if ((m = campo.match(/^sup:(\d+)$/))) { if (valor) est.sup[m[1]] = valor; else delete est.sup[m[1]]; }
+  else if (campo === 'problemas') est.problemas = valor;
+}
+
+function salvarCampo(id, campo, valor) {
+  CK_PEND[id] = CK_PEND[id] || {};
+  CK_PEND[id][campo] = valor;
+  statusSalvo(id, 'Salvando…');
+  chamar('salvarMarcacao', [pinAtual(), id, campo, valor], function () {
+    if (CK_PEND[id] && CK_PEND[id][campo] === valor) delete CK_PEND[id][campo];
+    if (!Object.keys(CK_PEND[id] || {}).length) statusSalvo(id, 'Salvo ✓');
+  }, function (e) {
+    statusSalvo(id, 'Não salvou: ' + e.message, true);
+  });
+}
+
+function reenviarPendentes(id) {
+  var pend = CK_PEND[id] || {};
+  Object.keys(pend).forEach(function (campo) { salvarCampo(id, campo, pend[campo]); });
+}
+
+/* ---------- fotos: comprimidas no celular (~300 KB) antes de subir ---------- */
+
+function comprimir(arquivo, lado, qualidade) {
+  return new Promise(function (ok, falha) {
+    var url = URL.createObjectURL(arquivo);
+    var img = new Image();
+    img.onload = function () {
+      var escala = Math.min(1, lado / Math.max(img.naturalWidth, img.naturalHeight));
+      var cv = document.createElement('canvas');
+      cv.width = Math.round(img.naturalWidth * escala);
+      cv.height = Math.round(img.naturalHeight * escala);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(url);
+      ok(cv.toDataURL('image/jpeg', qualidade));
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); falha(new Error('Não consegui ler essa foto')); };
+    img.src = url;
+  });
+}
+
+function enfileirarFoto(id, secao, arquivo) {
+  var item = { tmp: 't' + (++CK_SEQ), secao: secao, status: 'preparando', mini: '', dados: '' };
+  (CK_ENVIO[id] = CK_ENVIO[id] || []).push(item);
+  atualizarFotos(id);
+  comprimir(arquivo, 1600, 0.7).then(function (grande) {
+    item.dados = grande.split(',')[1];
+    return comprimir(arquivo, 200, 0.6);
+  }).then(function (mini) {
+    item.mini = mini;
+    item.status = 'fila';
+    atualizarFotos(id);
+    processarFila(id);
+  }).catch(function (e) {
+    CK_ENVIO[id] = CK_ENVIO[id].filter(function (x) { return x !== item; });
+    atualizarFotos(id);
+    toast(e.message);
+  });
+}
+
+function processarFila(id) {
+  if (CK_ENVIANDO[id]) return;
+  var item = (CK_ENVIO[id] || []).filter(function (x) { return x.status === 'fila'; })[0];
+  if (!item) return;
+  CK_ENVIANDO[id] = true;
+  item.status = 'enviando';
+  chamar('enviarFoto', [pinAtual(), id, item.secao, item.dados, item.mini], function (est) {
+    CK_ENVIANDO[id] = false;
+    CK_ENVIO[id] = CK_ENVIO[id].filter(function (x) { return x !== item; });
+    CK[id].fotos = est.fotos;
+    atualizarFotos(id);
+    processarFila(id);
+  }, function (e) {
+    CK_ENVIANDO[id] = false;
+    item.status = 'erro';
+    atualizarFotos(id);
+    toast('Foto não foi: ' + e.message);
+    processarFila(id);
+  });
+}
+
+function apagarFotoCk(id, fotoId) {
+  if (!confirm('Apagar esta foto?')) return;
+  var antes = CK[id].fotos;
+  CK[id].fotos = antes.filter(function (f) { return f.id !== fotoId; });
+  atualizarFotos(id);
+  chamar('apagarFoto', [pinAtual(), id, fotoId], function (est) {
+    CK[id].fotos = est.fotos;
+    atualizarFotos(id);
+  }, function (e) {
+    CK[id].fotos = antes;
+    atualizarFotos(id);
+    toast('Não deu pra apagar: ' + e.message);
+  });
+}
+
+function toast(t) {
+  var el = document.getElementById('toast');
+  el.textContent = t;
+  el.classList.add('mostra');
+  clearTimeout(toast.t);
+  toast.t = setTimeout(function () { el.classList.remove('mostra'); }, 2200);
+}
+
+function copiar(txt) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(function () { toast('Mensagem copiada'); }, function () { copiarVelho(txt); });
+  } else copiarVelho(txt);
+}
+function copiarVelho(txt) {
+  var ta = document.createElement('textarea');
+  ta.value = txt; document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); toast('Mensagem copiada'); } catch (e) { toast('Selecione o texto e copie'); }
+  ta.remove();
+}
+
+// Depois de Atualizar, reabre o que estava aberto.
+function reabrirChecklists() {
+  Array.prototype.forEach.call(document.querySelectorAll('details.ck'), function (d) {
+    if (CK_ABERTOS[d.getAttribute('data-ck')]) d.open = true;
+  });
+}
+
+function idDoAlvo(el) {
+  var d = el.closest && el.closest('details.ck');
+  return d ? d.getAttribute('data-ck') : null;
+}
+
+// "toggle" não borbulha: escuta na captura.
+document.addEventListener('toggle', function (e) {
+  var d = e.target;
+  if (!d.classList || !d.classList.contains('ck')) return;
+  var id = d.getAttribute('data-ck');
+  if (!d.open) { delete CK_ABERTOS[id]; return; }
+  CK_ABERTOS[id] = true;
+  if (CK[id]) renderCk(id);
+  carregarCk(id);
+}, true);
+
+document.addEventListener('change', function (e) {
+  var t = e.target, id = idDoAlvo(t);
+  if (!id || !CK[id]) return;
+  if (t.hasAttribute('data-item')) {
+    var k = t.getAttribute('data-item');
+    if (t.checked) CK[id].checks[k] = true; else delete CK[id].checks[k];
+    salvarCampo(id, 'check:' + k, t.checked);
+    atualizarCk(id);
+  }
+});
+
+// Fotos: o handler fica no próprio campo (onchange) porque a grade de fotos é
+// redesenhada enquanto outra foto sobe. Se o campo sair da tela com a galeria
+// aberta, o evento não chegaria ao document e a foto escolhida se perderia.
+function receberFotos(t) {
+  var id = t.getAttribute('data-ckid'), secao = t.getAttribute('data-add');
+  if (!id || !CK[id]) return;
+  Array.prototype.forEach.call(t.files || [], function (f) { enfileirarFoto(id, secao, f); });
+  t.value = '';
+}
+
+var PROB_TIMER = {};
+document.addEventListener('input', function (e) {
+  var t = e.target, id = idDoAlvo(t);
+  if (!id || !CK[id] || !t.hasAttribute('data-prob')) return;
+  CK[id].problemas = t.value;
+  atualizarCk(id);
+  clearTimeout(PROB_TIMER[id]);
+  PROB_TIMER[id] = setTimeout(function () { salvarCampo(id, 'problemas', t.value); }, 800);
+});
+
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('button');
+  if (!b) return;
+  var id = idDoAlvo(b);
+  if (!id) return;
+  if (b.hasAttribute('data-recarregar')) { carregarCk(id); return; }
+  if (!CK[id]) return;
+  if (b.hasAttribute('data-sup')) {
+    var i = b.getAttribute('data-sup'), v = b.getAttribute('data-v');
+    var novo = CK[id].sup[i] === v ? '' : v;
+    if (novo) CK[id].sup[i] = novo; else delete CK[id].sup[i];
+    Array.prototype.forEach.call(b.parentNode.querySelectorAll('button'), function (x) {
+      x.setAttribute('aria-pressed', String(novo === x.getAttribute('data-v')));
+    });
+    salvarCampo(id, 'sup:' + i, novo);
+    atualizarCk(id);
+  } else if (b.hasAttribute('data-apagar')) {
+    apagarFotoCk(id, b.getAttribute('data-apagar'));
+  } else if (b.hasAttribute('data-reenviar')) {
+    var tmp = b.getAttribute('data-reenviar');
+    (CK_ENVIO[id] || []).forEach(function (x) { if (x.tmp === tmp) x.status = 'fila'; });
+    atualizarFotos(id);
+    processarFila(id);
+  } else if (b.hasAttribute('data-retentar')) {
+    reenviarPendentes(id);
+  } else if (b.hasAttribute('data-copiar')) {
+    copiar(mensagemCk(id).texto);
+  }
+});
+
+/* Prévia no computador: mesmo contrato do Code.gs, guardado neste navegador. */
+var AMOSTRA_API = {
+  _ler: function (id) {
+    try { return JSON.parse(localStorage.getItem('nomades-ck-amostra|' + id)); } catch (e) { return null; }
+  },
+  _gravar: function (id, est) { guardar('nomades-ck-amostra|' + id, JSON.stringify(est)); return est; },
+  getChecklist: function (pin, id) {
+    return AMOSTRA_API._ler(id) || { checks: {}, sup: {}, problemas: '', fotos: [] };
+  },
+  salvarMarcacao: function (pin, id, campo, valor) {
+    var est = AMOSTRA_API.getChecklist(pin, id);
+    aplicarCampo(est, campo, valor);
+    return AMOSTRA_API._gravar(id, est);
+  },
+  enviarFoto: function (pin, id, secao, base64, mini) {
+    var est = AMOSTRA_API.getChecklist(pin, id);
+    est.fotos.push({ id: 'f' + Date.now() + Math.random().toString(36).slice(2, 6), secao: secao, mini: mini, kb: Math.round(base64.length * 0.75 / 1024) });
+    return AMOSTRA_API._gravar(id, est);
+  },
+  apagarFoto: function (pin, id, fotoId) {
+    var est = AMOSTRA_API.getChecklist(pin, id);
+    est.fotos = est.fotos.filter(function (f) { return f.id !== fotoId; });
+    return AMOSTRA_API._gravar(id, est);
+  }
+};
 
 /* ---------- carregar ---------- */
 
