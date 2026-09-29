@@ -138,6 +138,7 @@
   .tag-hora.prazo { background: var(--areia); color: var(--profundo); }
   .tag-prioridade { background: var(--laranja); color: var(--branco); }
   .tag-feito { background: var(--roxo); color: var(--branco); }
+  .tag-remarcada { background: transparent; color: var(--profundo); border: 1.5px dashed var(--profundo); }
   .ressalva { font-size: 13px; color: var(--suave); width: 100%; }
   .imovel {
     font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 24px;
@@ -634,13 +635,22 @@ function montarCronograma(dados) {
       .filter(function (ci) { return normalizar(ci.anuncio) === normalizar(co.anuncio) && ci.data >= co.data; })
       .sort(function (a, b) { return (a.data + a.horario).localeCompare(b.data + b.horario); })[0] || null;
     var proximaNaJanela = proxima && diasEntre(co.data, proxima.data) <= JANELA_KITS ? proxima : null;
-    var entradaMesmoDia = proxima && proxima.data === co.data ? proxima : null;
+
+    // Data da limpeza: a da coluna "Data da limpeza" quando foi remarcada;
+    // senão, o dia da saída. O cartão aparece no dia da limpeza.
+    var dataLimpeza = co.dataLimpeza || co.data;
+    var remarcada = dataLimpeza !== co.data;
+    var entradaMesmoDia = proxima && proxima.data === dataLimpeza ? proxima : null;
 
     // Horário: início ou prazo.
     var saida = co.horario || '11:00';
     var hora, prazo = false, ressalva = '';
     if (co.combinado) {
       hora = co.combinado;
+    } else if (remarcada) {
+      // Apartamento já vazio desde a saída: vale o prazo, não a hora de começar.
+      hora = entradaMesmoDia ? 'até as ' + horaCurta(entradaMesmoDia.horario || '15:00') : 'até as 15h';
+      prazo = true;
     } else if (minutos(saida) < minutos('11:00')) {
       hora = 'a partir das ' + horaCurta(saida);
       ressalva = 'Hóspede sai cedo — confirmar na manhã do dia';
@@ -659,11 +669,13 @@ function montarCronograma(dados) {
       if (!jaTem) avisos.push({ texto: anuncio.observacoes });
     }
 
-    var dia = dias.filter(function (d) { return d.data === co.data; })[0];
+    var dia = dias.filter(function (d) { return d.data === dataLimpeza; })[0];
     if (!dia) return;
     dia.limpezas.push({
       nomePlanilha: co.anuncio,
-      data: co.data,
+      data: co.data,              // dia da saída — identifica a limpeza (checklist e pasta no Drive)
+      dataLimpeza: dataLimpeza,   // dia em que a limpeza vai ser feita
+      remarcada: remarcada,
       imovel: imovel,
       anuncio: anuncio,
       hora: hora,
@@ -780,6 +792,7 @@ function cartao(l) {
 
   var tags = '<span class="tag tag-hora' + (l.prazo ? ' prazo' : '') + '">' + esc(l.hora) + '</span>';
   if (l.feito) tags += '<span class="tag tag-feito">✓ Feita</span>';
+  if (l.remarcada) tags += '<span class="tag tag-remarcada">↻ Remarcada · saída ' + ddmm(l.data) + '</span>';
   else if (l.prioridade) tags += '<span class="tag tag-prioridade">⚠️ ' + esc(l.prioridade) + '</span>';
   if (l.ressalva) tags += '<span class="ressalva">' + esc(l.ressalva) + '</span>';
 
@@ -809,7 +822,7 @@ function cartao(l) {
 
   // Checklist (salvo no Drive, compartilhado entre os celulares): abre em tela cheia.
   var id = l.data + '|' + l.nomePlanilha;
-  CK_INFO[id] = { apelido: im.apelido, data: l.data, kits: l.kits };
+  CK_INFO[id] = { apelido: im.apelido, data: l.dataLimpeza || l.data, kits: l.kits };
   h += '<div class="bloco bloco-ck">' + botaoCk(id) + '</div>';
   return h + '</article>';
 }
