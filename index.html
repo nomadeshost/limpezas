@@ -100,6 +100,10 @@
   .dia-chip.tem .qtd { background: var(--amarelo); color: var(--noite); }
   .dia-chip.ativo { background: var(--areia); color: var(--noite); border-color: var(--areia); }
   .dia-chip.ativo .qtd { background: var(--noite); color: var(--amarelo); }
+  .dia-chip.passado { opacity: 0.6; border-style: dashed; }
+  .dia-chip.passado.ativo { opacity: 1; border-style: solid; }
+  .dia-chip.passado .qtd { background: rgba(232, 228, 221, 0.15); color: inherit; }
+  .dia-chip.passado.ativo .qtd { background: var(--noite); color: var(--areia); }
 
   /* ---------- conteúdo ---------- */
   main { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; }
@@ -114,6 +118,13 @@
   }
   .dia-titulo h2 small { font-weight: 500; color: var(--suave); font-size: 16px; }
   .dia-titulo .conta { font-size: 13px; color: var(--suave); white-space: nowrap; }
+  #conteudo:not(.ver-passado) .dia.passado { display: none; }
+  .btn-passado {
+    display: block; width: 100%; margin-top: 12px; padding: 10px 14px;
+    background: transparent; color: var(--suave); font: inherit; font-size: 14px;
+    border: 1px dashed #cfc9bf; text-align: left; cursor: pointer;
+  }
+  .dia.passado .dia-titulo h2 { color: var(--suave); }
   .vazio {
     border: 1px dashed #cfc9bf; padding: 16px; color: var(--suave); font-size: 14px;
   }
@@ -618,8 +629,11 @@ function calcularKits(imovel, camas, proxima) {
 
 function montarCronograma(dados) {
   var hoje = dados.hoje;
+  // Dias anteriores (dados.inicio): para enviar checklist e fotos de uma limpeza
+  // já feita. Só aparecem os que tiveram limpeza.
+  var passados = dados.inicio ? Math.max(0, diasEntre(dados.inicio, hoje)) : 0;
   var dias = [];
-  for (var i = 0; i <= 7; i++) dias.push({ data: somar(hoje, i), limpezas: [] });
+  for (var i = -passados; i <= 7; i++) dias.push({ data: somar(hoje, i), i: i, passado: i < 0, limpezas: [] });
 
   dados.checkouts.forEach(function (co) {
     var imovel = acharImovel(co.anuncio);
@@ -700,7 +714,7 @@ function montarCronograma(dados) {
       });
     }
   });
-  return dias;
+  return dias.filter(function (d) { return !d.passado || d.limpezas.length; });
 }
 
 function juntar(lista) {
@@ -749,23 +763,49 @@ function renderizar(dados) {
   document.getElementById('atualizado').textContent =
     'Atualizado em ' + ddmm(g.slice(0, 10)) + ' às ' + g.slice(11, 16) + ' · puxa direto da planilha';
 
-  document.getElementById('dias').innerHTML = dias.map(function (d, i) {
-    var n = d.limpezas.filter(function (l) { return !l.feito; }).length;
-    var rot = i === 0 ? 'hoje' : SEMANA_CURTA[diaSemana(d.data)];
-    return '<button type="button" class="dia-chip' + (n ? ' tem' : '') + (i === 0 ? ' ativo' : '') +
-      '" data-alvo="dia-' + d.data + '"><span class="sem">' + rot + '</span><span class="num">' +
+  var nPassados = dias.filter(function (d) { return d.passado; }).length;
+  var rotChip = function (d) {
+    return d.i === 0 ? 'hoje' : d.i === -1 ? 'ontem' : SEMANA_CURTA[diaSemana(d.data)];
+  };
+
+  document.getElementById('dias').innerHTML = dias.map(function (d) {
+    // Dia passado: conta todas as limpezas, sem destaque amarelo.
+    var n = d.passado ? d.limpezas.length : d.limpezas.filter(function (l) { return !l.feito; }).length;
+    return '<button type="button" class="dia-chip' + (d.passado ? ' passado' : n ? ' tem' : '') +
+      (d.i === 0 ? ' ativo' : '') + '" data-alvo="dia-' + d.data + '"' + (d.passado ? ' data-passado="1"' : '') +
+      '><span class="sem">' + rotChip(d) + '</span><span class="num">' +
       d.data.slice(8, 10) + '</span><span class="qtd">' + n + '</span></button>';
   }).join('');
 
-  document.getElementById('conteudo').innerHTML = dias.map(function (d, i) {
-    var rotulo = i === 0 ? 'Hoje' : i === 1 ? 'Amanhã' : cap(SEMANA[diaSemana(d.data)]);
-    var sub = (i <= 1 ? SEMANA[diaSemana(d.data)] + ', ' : '') + ddmm(d.data);
+  var conteudo = document.getElementById('conteudo');
+  conteudo.classList.toggle('ver-passado', VER_PASSADO);
+  conteudo.innerHTML = (nPassados ? '<button type="button" class="btn-passado" id="btnPassado">' +
+      (VER_PASSADO ? '↑ Esconder dias anteriores' : '↩ Ver dias anteriores (' + nPassados + (nPassados === 1 ? ' dia' : ' dias') +
+      ' com limpeza) — para enviar checklist e fotos') + '</button>' : '') +
+    dias.map(function (d) {
+    var rotulo = d.i === 0 ? 'Hoje' : d.i === 1 ? 'Amanhã' : d.i === -1 ? 'Ontem' : cap(SEMANA[diaSemana(d.data)]);
+    var sub = (d.i >= -1 && d.i <= 1 ? SEMANA[diaSemana(d.data)] + ', ' : '') + ddmm(d.data);
     var n = d.limpezas.length;
     var corpo = n ? d.limpezas.map(cartao).join('') : '<div class="vazio">Nenhuma limpeza neste dia.</div>';
-    return '<section class="dia" id="dia-' + d.data + '"><div class="dia-titulo"><h2>' + rotulo +
+    return '<section class="dia' + (d.passado ? ' passado' : '') + '" id="dia-' + d.data + '"><div class="dia-titulo"><h2>' + rotulo +
       ' <small>· ' + sub + '</small></h2><span class="conta">' + (n ? n + (n === 1 ? ' limpeza' : ' limpezas') : '') +
       '</span></div>' + corpo + '</section>';
   }).join('');
+
+  var btnPassado = document.getElementById('btnPassado');
+  if (btnPassado) btnPassado.addEventListener('click', function () {
+    VER_PASSADO = !VER_PASSADO;
+    renderizar(dados);
+    if (VER_PASSADO) {
+      var primeiro = document.querySelector('.dia.passado');
+      if (primeiro) primeiro.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+
+  // A fileira de dias começa em "hoje"; os dias anteriores ficam à esquerda.
+  var nav = document.getElementById('dias');
+  var chipHoje = nav.querySelector('.dia-chip.ativo');
+  if (chipHoje) nav.scrollLeft = Math.max(0, chipHoje.offsetLeft - 4);
 
   ligarChips();
 }
@@ -835,6 +875,12 @@ function ligarChips() {
     c.addEventListener('click', function () {
       chips.forEach(function (x) { x.classList.remove('ativo'); });
       c.classList.add('ativo');
+      if (c.getAttribute('data-passado') && !VER_PASSADO) {
+        VER_PASSADO = true;
+        document.getElementById('conteudo').classList.add('ver-passado');
+        var bp = document.getElementById('btnPassado');
+        if (bp) bp.textContent = '↑ Esconder dias anteriores';
+      }
       var alvo = document.getElementById(c.getAttribute('data-alvo'));
       if (alvo) alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
@@ -1442,6 +1488,7 @@ var AMOSTRA_API = {
 
 var PREVIA_LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) || location.protocol === 'file:';
 var DADOS_HOJE = '';
+var VER_PASSADO = false;   // dias anteriores abertos (continua aberto ao tocar Atualizar)
 
 function mostrarErro(msg) {
   document.getElementById('conteudo').innerHTML =
